@@ -1,0 +1,496 @@
+<!--/opt/homebrew/lib/node_modules/mjml/bin/mjml-->
+<mjml>
+  <mj-head>
+    <mj-font name="Poppins" href="https://fonts.googleapis.com/css?family=Poppins:400,400i,700,700i" />
+    <mj-attributes>
+      <mj-all font-family="Poppins,sans-serif" font-size="14px" line-height="1.6" letter-spacing="-.3px" />
+      <mj-text color="#12142F" line-height="1.4" />
+      <mj-button background-color="#0047B2" padding-top="0" />
+      <mj-divider border-width="1px" border-style="solid" padding="0 20px 10px" border-color="#12142F" />
+      <mj-navbar-link text-transform="none" color="#12142F" padding="2px 4px" text-decoration="underline" target="_self" />
+      <mj-section background-color="#FFFFFF" padding="0" />
+      <mj-class name="section_header" align="center" line-height="1.2" container-background-color="#00337F" color="#FFF" />
+      <mj-class name="error_header" align="center" line-height="1.2" container-background-color="#DA0021" color="#FFF" />
+      <mj-class name="info_header" align="center" line-height="1.2" container-background-color="#0047B2" color="#FFF" />
+      <mj-class name="footer_text" align="center" line-height="1.2" color="#FFF" />
+      <mj-class name="small" font-size="12px" />
+    </mj-attributes>
+    <mj-style inline="inline"> a { color: #0047B2; } .welcome { padding: 20px 0 15px; } .welcome * { text-align: center; line-height: 1.2 !important; } p.title { font-weight: 600; margin-bottom: 0; margin-bottom: -8px; } .small { font-size: 12px; } .large { font-size: 15px; line-height:1.2; } h3, h4, no_margin { margin: 0; } ul { margin: 10px 0 0; padding: 0 20px; } li { margin: 2px 0 0; } .bes { color: #00337F; } .yavneh { color: #148D8B; } .croxdale { color: #4A1971; } .youth { color: #55A020; } .kids { color: #DA0021; } .women { color: #FF8900; } .white { color: #FFF; }</mj-style>
+  </mj-head>
+  <mj-body background-color="#FFFFFF" width="700px">
+    <mj-section>
+      <mj-column>
+        <mj-spacer />
+      </mj-column>
+    </mj-section>
+    <mj-include path="./header.mjml" />
+    <mj-wrapper padding="0 1px" background-color="#12142F">
+      <mj-section css-class="welcome">
+        <mj-column>
+          <mj-text>
+            <h3>Welcome to the BES weekly newsletter, where we keep you up-to-date on the latest projects and events happening across our community.</h3>
+          </mj-text>
+          <mj-navbar base-url="">
+            <mj-navbar-link text-decoration="none"><strong>In this email:</strong></mj-navbar-link>
+            <mj-navbar-link href="#israel">Israel</mj-navbar-link>
+            <mj-navbar-link href="#notices">Notices</mj-navbar-link>
+            <!--<mj-navbar-link href="#dt">D'var Torah</mj-navbar-link>-->
+            <mj-navbar-link href="#care">BES Care</mj-navbar-link>
+            <mj-navbar-link href="#yahrzeits">Yahrzeits</mj-navbar-link>
+            <mj-navbar-link href="#crp">CRP</mj-navbar-link>
+            <mj-navbar-link href="#other">Other</mj-navbar-link>
+          </mj-navbar>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <!--<mj-text mj-class="error_header" align="left">
+            <p><strong>UPDATE:</strong> <a href="#notices" style="color:#FFF">notices</a>.</p>
+          </mj-text>
+          <mj-spacer height="20px" />-->
+          <mj-divider />
+          <mj-spacer height="10px" />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <!-- Dash &#8209; -->
+          <mj-text>
+            <h3>Update from Miles Stock, Vice Chair Yavneh</h3>
+            <p>As the winter months fade into memory and the evenings begin to stretch a little longer, this feels like a natural moment to pause and reflect. The past few months have been full and joyful, marked by many simchas and by meaningful gatherings for Tu Bishvat, Purim and Pesach. At the same time, we are already looking ahead to what the coming months will bring — from next week’s sold out BES Community Lunch, to our plans for the days and evenings of Shavuot, and (dare I say it) even the High Holy Days. For some, the date most eagerly anticipated is the AGM on 13 May, when several of our community members will be recognised through the awarding of the BESties 2026.</p>
+            <p> With the AGM in mind, I would like to take this opportunity to thank all members of our Shul Council for the commitment, time and energy they give so generously on behalf of the community. This year, the Senior Leadership Team has introduced a set of portfolios to allow council members to support BES in a more focused and effective way, and I very much look forward to working together over the coming 12 months.</p>
+            <p> This Shabbat is a particularly special one, as we welcome Mizrachi Weekend of Inspiration. We began with a memorable evening during the week, hearing Rabbi Doron Perez in conversation with Eddie Hammerman, and we are delighted to be hosting Rabbanit Karen Hochhauser and Rabbi Anthony Manning, who will each be speaking at both sites over Shabbat. I very much encourage you to try to hear them if you can.</p>
+            <p> Finally, for those with an eye on our community’s history, April 2007 marked the first Yavneh minyan. This week therefore begins our <em>“BES@Yavneh at 20”</em> celebrations — with several exciting plans already in the works, which I look forward to sharing in due course.</p>
+            <p> Wishing you all a warm Shabbat Shalom, and an enjoyable extra long weekend. <br /> Miles Stock<br />Vice Chair Yavneh </p>
+          </mj-text>
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/05/woi-2026.png" />
+          <mj-spacer />
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-spacer height="10px" />
+          <mj-divider />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-text padding-bottom="0">
+            <h3>Shabbat Emor
+              <!--<br /><span style="font-weight:normal">Parasha Tazria-Metzora</span>-->
+            </h3>
+            <p>1 - 2 May 2026<br />15 Iyar 5786</p>
+          </mj-text>
+        </mj-column>
+        <mj-column>
+          <mj-text>
+            <ul>
+              <li>Earliest Lighting <em>Plag HaMincha</em> 6.51pm</li>
+              <li><strong>Community Candle Lighting</strong> 7.30pm</li>
+              <li><strong>Shabbat Begins</strong> 8.09pm</li>
+              <li><strong>Shabbat Ends</strong> 9.19pm</li>
+            </ul>
+            <br />
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-text padding-top="0" padding-bottom="0">
+            <h3>Friday Night 1 May</h3>
+            <!--<strong class="youth">Youth</strong> enjoy a Gingerbread when joining Kabbalat Shabbat at BES@Croxdale or BES@Yavneh. -->
+            <ul>
+              <li><strong class="croxdale">Croxdale</strong> 7.00pm followed by a short talk from Rabbi Manning
+                <!--with Gingerbread storytime-->
+              </li>
+              <li><strong class="yavneh">Yavneh</strong> 7.00pm followed by a short talk from Rabbanit Hochhauser
+                <!--with Gingerbread storytime-->
+              </li>
+              <li><strong class="bes">Elstree Minyan</strong> 7.00pm, at the home of the Assor Family*</li>
+              <!--<li><strong class="youth">Youth Kabbalat Shabbat</strong> 6.11pm at Croxdale</li>
+              <li><strong class="women">Shema Koleinu Kabbalat Shabbat</strong> 4.09pm for women and girls, at BES@Croxdale (in the youth hangout room) </li>-->
+            </ul>
+            <!--<p><strong class="youth">Youth Friday Night Oneg</strong> (for Yrs 10-13) 8.00pm - 9.30pm at the home of the Brownsteins*</p>
+            <ul>
+              <li><strong>Friday Night Oneg</strong> from 8.30pm; kindly hosted by Claudia & Jeremy Godley*</li>
+            </ul>-->
+            <p class="small">* For full address details please <a href="mailto:info@borehamwoodshul.org">email</a> the Shul Office.</p>
+            <br />
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section padding-bottom="0" padding-top="0">
+        <mj-column>
+          <mj-text padding-bottom="0" padding-top="0">
+            <h3>Shabbat 2 May</h3> ⏰ Latest time for Shema 9.15am<br />
+            <strong class="kids">CRP Desk</strong> will be open from 10.15am - 11am
+            <!--; Earliest time for Mincha 12.40pm-->
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section padding-top="0">
+        <mj-column>
+          <mj-text>
+            <h3>
+              <span class="croxdale">Croxdale</span>
+            </h3>
+            <ul>
+              <li><strong>Hashkama</strong> 8.00am with a short talk from Rabbi Manning</li>
+              <!--<li><strong>Tov Lehodot</strong> 9.00am</li>-->
+              <li><strong>Limmud</strong> 9.30am</li>
+              <li><strong>Shacharit</strong> 9.30am with Rabbi Chapper with a talk from Rabbi Manning before Mussaf - <em>we also hope to be joined by our MP Sir Oliver Dowden during the morning</em></li>
+              <!--<li><strong>Community Breakfast & Discussion</strong> after Shacharit, with Rabbi Finn <em>Unwrapping Mishloach Manot</em> before returning to Shul for Ein Kamocha</li>-->
+              <!--<li><strong class="women">Shema Koleinu</strong> (Upstairs, New Building) 9.45am - see details below</li>-->
+              <!--<li><strong class="women">Shema Koleinu Service</strong> 10.30am for women and girls - see poster for details</li>-->
+              <li><strong class="youth">Youth Breakfast with Rabbi Manning</strong> 10.15am</li>
+              <li><strong class="kids">Children's Services</strong> 11.00am followed by Token Swap</li>
+              <li><strong class="youth">Youth Discussion with Jo Pearlman</strong> 11.00am</li>
+              <!--
+<li><strong class="youth">Youth Discussion & Breakfast</strong> 10.15am with Michael Goldstein </li>
+              <li><strong class="youth">Full Youth Service</strong> 9.45am followed by Kiddush</li>
+<li><strong>Coffee, Cake and Conversation</strong> 11.00am with Rabbi Finn "What Really Happened in Sodom?"</li>-->
+              <!--<li><strong class="kids">Children's Services</strong> 11.00am</li>-->
+              <!--<li><strong class="kids">Token Swap</strong> after the Children's Services</li>-->
+              <!--<li><strong class="youth">Youth Mussaf</strong> followed by Hangout time 11.00am</li>-->
+              <li><strong>Kiddush</strong> after the main service</li>
+              <li><strong>Mincha</strong> 7.45pm followed by a Shawarma Seudah with Rabbanit Hochhauser </li>
+              <li><strong>Ma'ariv when Shabbat ends</strong> 9.19pm</li>
+            </ul>
+          </mj-text>
+        </mj-column>
+        <mj-column>
+          <mj-text>
+            <h3 class="yavneh">Yavneh</h3>
+            <ul>
+              <li><strong>A Cup of Inspiration</strong> 9.00am</li>
+              <li><strong>Shacharit</strong> 9.15am with Rabbi Greg with a talk from Rabbanit Hochhauser at the end of the service - <em>we also hope to be joined by local dignitaries during the morning</em></li>
+              <!--<li><strong>Shacharit - Parallel Service</strong> 9.15am in the LRC</li>-->
+              <!--<li><strong class="women">Shema Koleinu Shorts</strong> Breakfast and Service 10.15am for women and girls - see poster for details</li>-->
+              <!--<li><strong>Ya'aleh</strong> 9.35am with Rabbi Finn</li>-->
+              <li><strong class="youth">Youth Breakfast & Discussion</strong> 10.15am</li>
+              <li><strong class="kids">Anim Zemirot Club</strong> 10.30am</li>
+              <li><strong class="kids">Children's Services</strong> 11.00am followed by Token Swap</li>
+              <!-- <li><strong class="kids">Children's Services</strong> 11.00am</li>
+<li><strong class="kids">Children's Birthday Breakfast</strong> 10.30am followed by Children's Services</li>
+              <li><strong class="kids">Token Swap</strong> after the Children's Services</li>-->
+              <!--<li><strong>Mincha</strong> after Kiddush </li>-->
+              <li><strong>Kiddush</strong> after the main service</li>
+              <li><strong>J.F.K. Just From Kiddush</strong> 10 minute discussion on the Parsha following Kiddush - all welcome</li>
+              <li><strong>Mincha</strong> 7.40pm followed by Seudah with Rabbi Manning </li>
+              <li><strong>Ma'ariv when Shabbat ends</strong> 9.19pm</li>
+            </ul>
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-text>
+            <ul>
+              <li><strong>Bnei Akiva</strong> at the Community Hub, Croxdale Road 3.30pm - 5.30pm </li>
+              <li><strong class="women">Women's Summer Seudah</strong> at the Community Hub, Croxdale Road 5.30pm - 7.00pm - see poster below for details.</li>
+              <!--<li><strong>BASE</strong> has finished for this season.</li>-->
+            </ul>
+            <br />
+            <!--<h3>🔔 Clocks change Sunday morning, 1.00am GMT > 2.00am BST.</h3>-->
+          </mj-text>
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/05/bes_limmud_2may26v2.png" />
+
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/05/woi-2026-wss.png" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/05/Youth-Shabbat-May26.png" />
+          <mj-spacer height="15px" />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- htmlmin:ignore --><a name="israel"></a><!-- htmlmin:ignore -->Israel
+            </h3>
+          </mj-text>
+          <mj-spacer height="10px" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/02/btm-vigil-brew.png" href="https://tinyurl.com/bwvcommunity" />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-spacer height="15px" />
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- htmlmin:ignore --><a name="weekday"></a><!-- htmlmin:ignore -->BES Weekday Services
+            </h3>
+          </mj-text>
+          <mj-text padding-bottom="0">
+            <p>Your help is needed to ensure a Minyan at these services, especially for those who are currently saying Kaddish, please attend if possible.</p>
+            <h4>All services are at the Community Hub, Croxdale Road
+              <!--
+              unless otherwise specified-->.
+            </h4>
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-text>
+            <h3>Shacharit</h3>
+            <ul>
+              <li><strong>Sunday & Monday (Bank Holiday)</strong> 8.30am</li>
+              <li><strong>Tuesday, Wednesday & Friday</strong> 7.15am</li>
+              <li><strong>Thursday</strong> 7.05am</li>
+            </ul>
+          </mj-text>
+        </mj-column>
+        <mj-column>
+          <mj-text>
+            <h3>Mincha &amp; Ma'ariv</h3>
+            <ul>
+              <li><strong>Sunday - Thursday</strong> 7.30pm </li>
+              <!--<li><strong>Monday</strong><br />
+                <strong>Mincha Only</strong> at the Kollel 1.00pm<br />
+                <strong>Ma'ariv Only</strong> 7.30pm
+              </li>-->
+            </ul>
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-spacer height="15px" />
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- htmlmin:ignore --><a name="notices"></a><!-- htmlmin:ignore -->Notices
+            </h3>
+          </mj-text>
+          <mj-text>
+            <p class="title">Mazal Tov to</p>
+            <ul>
+              <li><strong>Beverley & Stephen Morris</strong> on Charlie Becker’s Aufruf at Croxdale.</li>
+              <li><strong>Susie & Ross Petar</strong> on Coby’s Bar Mitzvah at Gesher School.</li>
+              <li><strong>Cynthia & Norman Roberts</strong> on the occasion of their grandson`s Bar Mitzvah in Israel</li>
+              <li><strong>Leora Cohen</strong> on her 50th birthday</li>
+            </ul>
+            <p class="title">Long Life to</p>
+            <ul>
+              <li><strong>Michael Keisner</strong> on the sad passing of his mother, Pamela Keisner.</li>
+              <li><strong>Tony, Daniel, Lucy and Joanna</strong> on the sad passing of their wife and mother, Rita Rose.</li>
+              <li><strong>Paul Marco</strong> on the sad passing of his father Graham Marco.</li>
+            </ul>
+            <!--<p class="title">Stone Settings</p>
+            <ul>
+            </ul>-->
+            <p class="title">Sponsorship</p>
+            <ul>
+              <li>This week's Kiddush at Croxdale is kindly sponsored by <strong>the Becker and Morris families</strong> in honour of the Aufruf of Charlie and forthcoming marriage to Georgina.</li>
+              <li>This week's sweets and alcohol for Kiddush at Yavneh is kindly sponsored by <strong>Kat & Leo Brownstein</strong> on the anniversary of Coby’s Bar Mitzvah.</li>
+              <!--              <li>This week's Friday night Kiddush at the Elstree minyan is kindly sponsored by </li>
+<li>This week’s newsletter is kindly sponsored by </li>
+<li>Friday night Kiddush at Croxdale is kindly sponsored by </li>
+            
+<li>This week's Kiddush at Croxdale is kindly sponsored by </li>
+              <li>This week's Kiddush at Yavneh is kindly sponsored by </li>
+              <li>This week's Kiddush at Ya'aleh is kindly sponsored by </li>
+              <li>'s children's birthday breakfast at <strong></strong> is kindly sponsored by <ul style="margin-top:0;">
+                  <li></li>
+                </ul>
+              </li>-->
+            </ul>
+            <p class="title">Thank You</p>
+            <ul>
+              <li>To everyone who has sponsored, volunteered, donated, set up events or taken part in activities at BES. <br />
+                <br />
+              </li>
+            </ul>
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-divider />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-text padding-top="0" padding-bottom="0">
+            <p><strong>Would you like to mark a birthday, anniversary or other simcha or yahrzeit?</strong> Please contact <a href="mailto:debbie@borehamwoodshul.org">debbie@borehamwoodshul.org</a> to discuss sponsorship opportunities.</p>
+          </mj-text>
+          <!--<mj-image src="https://borehamwoodshul.org/assets/uploads/2025/07/Donate-a-Siddur.png?v2" href="https://onebes.uk/siddur" />-->
+          <mj-spacer height="15px" />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-divider />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-text padding-top="0">
+            <p>If you would like us to include your entry in the newsletter, please <a href="mailto:info@borehamwoodshul.org">email</a> the office.</p>
+            <p>Please remember to update the Shul office at your earliest convenience if any of your details need changing.</p>
+            <p><strong>If you or someone you know is unwell</strong>, please let one of the Rabbinic Team know or contact Karen on <a href="tel:07341005116">07341 005 116</a> or email <a href="mailto:care@borehamwoodshul.org">care@borehamwoodshul.org</a>. We are here to support you in times of need.</p>
+          </mj-text>
+          <mj-spacer height="10px" />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- Dash &#8209; -->
+              <!-- htmlmin:ignore --><a name="dt"></a><!-- htmlmin:ignore -->D'var Torah by Rabbi Alex Chapper
+            </h3>
+          </mj-text>
+          <mj-text>
+            <p> We’re understandably shocked, but not surprised, by Wednesday’s terrorist attack in Golders Green. Another week, another act intended to spread fear and intimidation within the Jewish community. Our first thoughts and prayers are with the victims, their families, and all those affected.</p>
+            <p> While those who sponsor and perpetrate these antisemitic attacks are driven by hatred and evil, the Torah issues a majestic call to us: to make a Kiddush Hashem - to sanctify G&#8209;d’s Name. This isn’t an abstract or elusive ideal, but a deeply practical mandate to bring holiness into the fabric of everyday life. But how do we achieve it?</p>
+            <p> By remaining true to our mission. By acting with kindness, dignity, and integrity. By cherishing the gift of life and living it with purpose.</p>
+            <p> The Rambam teaches that when we live in a way that reflects the values of Torah, it inspires others to recognise something greater beyond the individual - a life guided by G&#8209;d. In this sense, every one of us becomes an ambassador of G&#8209;d in this world.</p>
+            <p> That’s why we’ll never run or hide from those who seek to harm us, because making a Kiddush Hashem demands something more. It calls on us to live with pride in our identity, to stand firm in the face of hatred, and to respond to darkness not with fear, but with light.</p>
+            <p> That is our strength. And that is our message. </p>
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-divider />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-text>
+            <ul>
+              <li>For the <strong>Daf Hashavua</strong> online, please <a href="https://theus.org.uk/resources/daf-hashavua/">click here</a>.</li>
+              <li>The <strong>Chief Rabbi's D'var Torah</strong> can be accessed by <a href="https://chiefrabbi.org/dvar-torah/">clicking here</a>.</li>
+              <li>To watch <strong>Rabbi &amp; Rebbetzin Chapper's weekly broadcast</strong> go to one of the <a href="https://www.facebook.com/BorehamwoodShul">BES Facebook pages</a> or on <a href="https://www.youtube.com/@rabbichapper843">YouTube</a></li>
+            </ul>
+            <br />
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-spacer height="10px" />
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- htmlmin:ignore --><a name="care"></a><!-- htmlmin:ignore -->BES Care
+            </h3>
+          </mj-text>
+          <mj-spacer height="20px" />
+          <mj-text>
+            <h3>If you would like help coming to shul events, we have volunteers who can drive you. Please contact Karen on <a href="tel:07341005116">07341 005 116</a>, if you would like help with transport.</h3>
+          </mj-text>
+          <mj-spacer height="20px" />
+          <mj-divider />
+          <mj-text>
+            <p class="title">If you or someone you know may benefit from support, please reach out in confidence to our professional Community Support Coordinator Karen on <a href="tel:07341005116">07341 005 116</a> / <a href="mailto:care@borehamwoodshul.org">care@borehamwoodshul.org</a></p>
+            <p class="title">Volunteering</p>
+            <p>If you are interested in volunteering for BES Care, we have a variety of opportunities available, including befriending, driving, delivering food parcels and more.</p>
+          </mj-text>
+          <mj-button href="mailto:care@borehamwoodshul.org">Join the BES Care Volunteer Team</mj-button>
+          <mj-spacer height="10px" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2024/02/BESCare-Here-to-help.png" />
+          <mj-text>
+            <p>
+              <strong>BES Care are delivering essential food items to many people in the community. If this would be a helpful support for you, please contact Karen on <a href="tel:07341005116">07341 005 116</a> or email <a href="mailto:care@borehamwoodshul.org">care@borehamwoodshul.org</a>.</strong>
+            </p>
+            <p class="title">Hardship Fund</p>
+            <p>Our confidential Hardship Fund provides financial support and food vouchers to people in the community. The numbers who need our help has doubled in the past few years as people are struggling to pay their bills and buy food and clothes.</p>
+            <p>We want to be able to help everyone who needs and ask those members who can donate to please offer their support. Referrals are continuing to increase as people are worried about paying for food and heating.</p>
+          </mj-text>
+          <mj-button href="https://www.justgiving.com/fundraising/borehamwood-hardship-fund">Please help by donating what you can.</mj-button>
+          <mj-spacer height="20px" />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- htmlmin:ignore --><a name="yahrzeits"></a><!-- htmlmin:ignore -->We wish long life to those observing a Yahrzeit from 2 - 8 May
+            </h3>
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-spacer height="10px" />
+          <mj-text mj-class="small"> Estelle Allen, Father Samuel Wilder<br /> Stephen Ash, Father Len Ash<br /> Deborah Baum, Father in Law Brian Baum<br /> Jason Baum, Father Brian Baum<br /> Amanda Bookatz, Grandmother Nina Lipman<br /> Jason Bookatz, Mother Brenda Bookatz<br /> Fiona Brooks, Grandmother Nina Lipman<br /> Simone Cantor, Mother Elaine Benjamin<br /> Jenny Cohen, Mother Rosalind Cregor<br /> Ruth Cohen, Mother Rita Lightman<br /> Linda Commissar, Mother Ida Commissar<br /> Carole Constad, Husband David Constad<br /> Victoria Dadds, Brother Richard Cohen<br /> Lawrence Davis, Father Simon Davis<br /> Fiona Davis (Goodkind), Mother Erica Goodkind<br /> Robert Errington, Sister Judy Errington<br /> Anthony Field, Grandmother Anne Field<br /> Howard Fox, Father Joseph Fox<br /> Jamie Freed, Father Richard Freed<br /> Susan Gerrard, Mother Hilda Guth<br /> Ivor Gold, Wife Audrey Gold<br /> Jane Goodman, Mother Anne Cutter<br /> Jeffrey Hartstone, Father Clive Hartstone<br /> Nina Hirschfield, Father Boris Shenderovich<br /> Karen Jacobs, Father Clive Hartstone<br /> Amanda Kaliski, Father Alan Dorfman<br /> Tammi Kallenberg, Father Wolfie Ginsburg<br /> Karen Kay, Sister Janice Epstein<br /> Trudie Kintish, Mother Miriam Shineberg<br /> Gary Lander, Father Martin Lander<br /> Geraldine Lander, Sister Shirley Bierman<br /> James Larholt, Mother Gladys Larholt<br />
+          </mj-text>
+          <mj-spacer height="20px" />
+        </mj-column>
+        <mj-column>
+          <mj-spacer height="10px" />
+          <mj-text mj-class="small"> Michelle Leigh, Son Oliver Leigh<br /> Brenda Levene, Mother Minnie Young<br /> Lionel Leventhal, Wife Elizabeth Leventhal<br /> Michael Levy, Father Louis Levy<br /> Candice Liffmann, Father Peter Leslie<br /> Julian Low, Mother Enid Low<br /> Lorraine Meredith, Mother Sandra Pearce<br /> Gillian Miller, Father Alfred Barnes<br /> Barry Morley, Father David Morley<br /> Vivien Newton, Mother Pearl Landau<br /> Ellie Olmer, Father David Constad<br /> Leslie Paster, Father Gerald Paster<br /> Annette Perlmutter, Mother Lilian Frankel<br /> Stephen Rind, Mother Hetty Rind<br /> Norman Roberts, Sister Brenda Bookatz<br /> Harvey Samuels, Mother Rosetta Samuels<br /> Karen Seaton, Father Martin Lander<br /> Angela Segall, Father Sidney Koss<br /> Barry Shaw, Sister Ingrid Rockberger<br /> Leonard Shear, Wife Elaine Shear<br /> Mark Shear, Mother Elaine Shear<br /> Sharon Shenker, Father Jacob Azizullahoff<br /> Martine Sherman, Grandmother Dorothy Peires<br /> Jean Spelman, Husband Monty Spelman<br /> Susanne Stern, Father Hugo Tessler<br /> Suzanne Trenton, Mother Myriam Cohen<br /> David Trovato, Father Guiseppe Trovato<br /> David Wernick, Mother Faye Wernick<br /> Amanda Wilder, Mother Sandra Pearce<br /> Martin Wilder, Father Israel Wilder<br /> Paul Wilder, Father Israel Wilder<br /> Samantha Wolbrom, Mother Susan Byrnes<br />
+          </mj-text>
+          <mj-spacer height="20px" />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-divider />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-text>
+            <p class="title">Yahrzeit Information</p>
+            <p>You are kindly reminded that if you are commemorating a Yahrzeit and would like your loved one's name to be read out in the Memorial Prayer, or if you would like a Mitzvah in Shul on the preceding Shabbat, it is essential to return the form on the bottom of the Yahrzeit notification by post or <a href="mailto:yahrzeit@borehamwoodshul.org">email</a> by the previous Thursday at the latest. Otherwise, it may not be possible to offer you a Mitzvah on Shabbat morning.</p>
+            <p>You can also contact the office via phone on <a href="tel:02083865227">020 8386 5227</a> or <a href="mailto:yahrzeit@borehamwoodshul.org">email</a>, to request that your loved one's name be included in the Memorial Prayer with the Rabbi.</p>
+          </mj-text>
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- htmlmin:ignore --><a name="crp"></a><!-- htmlmin:ignore -->CRP - Certificate of Religious Practice
+            </h3>
+          </mj-text>
+          <mj-text>
+            <p class="title"><strong>Collection of CRP points to start school in September 2027 has started.</strong></p>
+            <p>You must register each child you plan to collect CRP points via synagogue attendance here: <a href="https://myus.theus.org.uk/crp-application/crp-user-login/">myus.theus.org.uk/crp-application/crp-user-login/</a></p>
+            <p>The dates eligible for CRP collection are between <strong>18th April 2026</strong>&nbsp;and <strong>9th January 2027</strong>&nbsp;(but please check with the school you are applying to as deadlines differ), both BES@Croxdale &amp; BES@Yavneh will be using the United Synagogue system,&nbsp;<strong>if you plan to attend both sites, you will need to register separately for each</strong>.</p>
+            <p><strong>CRP Desk</strong></p>
+            <p><span style="font-weight: 400;">The CRP desk is where the sheets are handed out to those arriving to record CRP attendance. We rely on volunteers to run the desk, so please help if you can. If no one volunteers, there will be no CRP desk that day. <strong><a href="https://borehamwoodshul.org/crp-desk-sign-up">Please sign up here.</a></strong></span></p>
+            <p>FAQ’s and more information on CRP can be found here: <a href="https://www.theus.org.uk/crp">www.theus.org.uk/crp</a> or contact <a href="mailto:crp@borehamwoodshul.org">crp@borehamwoodshul.org</a></p>
+          </mj-text>
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- htmlmin:ignore --><a name="other"></a><!-- htmlmin:ignore -->Other Information
+            </h3>
+          </mj-text>
+          <mj-text>
+            <p class="title">Cholim &amp; Refuah Shleima</p>
+            <p>If you know of anyone who is unwell in whatever way, please email their Hebrew name (with their mother's name if known) to <a href="mailto:info@borehamwoodshul.org">info@borehamwoodshul.org</a>. Names on the list will be read in Shul on Shabbat with a new list being generated once a fortnight. To all our members or their family who are ill, in hospital or recuperating from illness or surgery, we wish them a Refuah Shleimah. Also, please let Karen or one of the Rabbinic Team know. They are here to support you in times of need.</p>
+            <p class="title">Women's Mikveh</p>
+            <p>Please text or call <a href="tel:07504 927 066">07504 927 066</a> for appointments - please try and give at least 48 hours notice. For Friday night or Yom Tov please contact Rebbetzin Chapper on <a href="tel:07850036046">07850 036 046</a>.</p>
+            <p>The refurbished Keilim Mikveh is also available at Croxdale Road.</p>
+            <p class="title"><a href="https://bes-website.s3.amazonaws.com/web-images/legacy.png?mtime=20231107172246&focal=none"><img src="https://bes-website.s3.amazonaws.com/web-images/legacy.png?mtime=20231107172246&focal=none" width="180" style="float:right;margin:0 0 20px 20px;" /></a>Leaving a Gift in Your Will</p>
+            <p>The United Synagogue powers Jewish life through its 56 communities and the critical infrastructure and programmes it provides for the British Jewish community.</p>
+            <p> At a time of such uncertainty and worry, the importance of standing strong as a community is even greater – as is ensuring that these values are passed down to those who come after us.</p>
+            <p> By leaving a gift in your will to your US shul you will enable your community to thrive and ensure that it is there for the next generation.</p>
+            <p>For more information contact Elliot Shorrick: <a href="mailto:eshorrick@theus.org.uk">eshorrick@theus.org.uk</a> 020 4529 9792.</p>
+            <p class="title">Safeguarding Information</p>
+            <p>The United Synagogue is ever more conscious of the threat to children and vulnerable adults from people who would seek to do them harm - whether by physical, emotional or sexual abuse or by neglect. Within every United Synagogue community therefore there is a volunteer Community Safeguarding Coordinator (CSC). This is someone within the community who is the primary point of contact at local level for members of the shul if they have any concerns in relation to child protection or the protection of vulnerable adults.</p>
+            <ul>
+              <li><strong class="croxdale">Croxdale's</strong> Community Safeguarding Coordinator is <strong>Katie Matlin</strong></li>
+              <li><strong class="yavneh">Yavneh's</strong> Community Safeguarding Coordinator is <strong>Helene Silverstone</strong></li>
+            </ul>
+            <p>They are the grassroots point of contact for our community and will pass on any concerns to and receive advice from the United Synagogue Head Office Safeguarding Team.</p>
+            <p>If you have a concern and would prefer to speak to someone within the United Synagogue Head Office Safeguarding team, you can reach them on <a href="tel:02037588440">020 3758 8440</a>. You can use this number for any safeguarding concerns either current or historic. If ever you believe someone to be at serious imminent risk, you MUST call 999.</p>
+            <p>-</p>
+            <p class="title">It's wonderful to see so many children and young people joining us on Shabbat. To ensure everyone feels safe and welcome on our sites, we ask that all children and young people under the age of 18 attending Croxdale or Yavneh be accompanied by a parent, a responsible adult, a trusted older sibling or a family friend aged 18 or over.</p>
+            <p> We understand that parents and guardians are not always able to attend themselves, but we ask that you ensure any child or young person coming to our sites does so with appropriate arrangements in place. As the signs on our premises make clear, Borehamwood & Elstree Synagogue is not responsible for the supervision of children on site, and that responsibility remains with parents and guardians at all times - whether or not they are present.</p>
+            <p><em> If you have any concerns about behaviour on site, please raise them with an Honorary Officer, who can be identified by their badge. For safeguarding concerns, details of the safeguarding coordinator at each site are clearly displayed on the premises.</em></p>
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-text mj-class="section_header">
+            <h3>We wish you Shabbat Shalom from the BES Team</h3>
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-include path="./footer.mjml" />
+    </mj-wrapper>
+    <mj-section>
+      <mj-column>
+        <mj-spacer />
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

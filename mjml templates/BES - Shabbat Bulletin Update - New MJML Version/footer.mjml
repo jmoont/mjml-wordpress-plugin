@@ -1,0 +1,27 @@
+<mj-section background-color="#12142F" padding="20px 0">
+  <mj-group width="70%">
+    <mj-column>
+      <mj-image padding-left="0" padding-right="0" height="28px" width="28px" src="https://app-rsrc.getbee.io/public/resources/social-networks-icon-sets/circle-color/facebook@2x.png" href="https://www.facebook.com/BorehamwoodShul"></mj-image>
+    </mj-column>
+    <mj-column>
+      <mj-image padding-left="0" padding-right="0" height="28px" width="28px" src="https://app-rsrc.getbee.io/public/resources/social-networks-icon-sets/circle-color/twitter@2x.png" href="https://twitter.com/BorehamwoodShul"></mj-image>
+    </mj-column>
+    <mj-column>
+      <mj-image padding-left="0" padding-right="0" height="28px" width="28px" src="https://app-rsrc.getbee.io/public/resources/social-networks-icon-sets/circle-color/linkedin@2x.png" href="https://www.linkedin.com/company/bes-shul/"></mj-image>
+    </mj-column>
+    <mj-column>
+      <mj-image padding-left="0" padding-right="0" height="28px" width="28px" src="https://app-rsrc.getbee.io/public/resources/social-networks-icon-sets/circle-color/instagram@2x.png" href="https://www.instagram.com/borehamwoodelstreeshul/"></mj-image>
+    </mj-column>
+    <mj-column>
+      <mj-image padding-left="0" padding-right="0" height="28px" width="28px" src="https://app-rsrc.getbee.io/public/resources/social-networks-icon-sets/circle-color/youtube@2x.png" href="https://www.youtube.com/c/BorehamwoodShul"></mj-image>
+    </mj-column>
+  </mj-group>
+</mj-section>
+<mj-section background-color="#12142F" padding="0 0 20px">
+  <mj-column>
+    <mj-text mj-class="footer_text">
+      <strong>Borehamwood &amp; Elstree Synagogue</strong><br /><a href="https://borehamwoodshul.org" style="color:#eee;">www.borehamwoodshul.org</a><br /><br /> Tel: <a href="tel:02083865227" style="color:#eee;">020 8386 5227</a> | Email: <a href="mailto:info@borehamwoodshul.org" style="color:#eee;">info@borehamwoodshul.org</a><br /> Croxdale Road, Borehamwood, Hertfordshire WD6 4QA
+    </mj-text>
+    <mj-text mj-class="footer_text">If you no longer wish to receive community news updates from Borehamwood &amp; Elstree United Synagogue, please unsubscribe <a href="[unsubscribe]" style="color:#eee;">here</a>.</mj-text>
+  </mj-column>
+</mj-section>

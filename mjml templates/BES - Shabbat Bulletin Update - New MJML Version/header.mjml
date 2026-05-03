@@ -1,0 +1,11 @@
+<mj-section padding-bottom="0">
+  <mj-column>
+    <mj-text padding-top="0" align="center" font-size="10px"><a href="[webversion]" style="text-decoration:none; color:#999;">View this email in your browser</a></mj-text>
+    <mj-spacer height="8px" />
+  </mj-column>
+</mj-section>
+<mj-section background-color="#12142F" padding="20px 0">
+  <mj-column>
+    <mj-image width="300px" src="https://bes-website.s3.amazonaws.com/web-images/bes_logo_white.png" href="https://www.borehamwoodshul.org/" alt="Borehamwood & Elstree Synagogue"></mj-image>
+  </mj-column>
+</mj-section>

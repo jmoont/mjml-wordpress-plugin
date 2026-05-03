@@ -1,0 +1,220 @@
+<mjml>
+  <mj-head>
+    <mj-font name="Poppins" href="https://fonts.googleapis.com/css?family=Poppins:400,400i,700,700i" />
+    <mj-attributes>
+      <mj-all font-family="Poppins,sans-serif" font-size="14px" line-height="1.6" letter-spacing="-.3px" />
+      <mj-text color="#12142F" line-height="1.4" />
+      <mj-button background-color="#0047B2" padding-top="0" />
+      <mj-divider border-width="1px" border-style="solid" padding="0 20px 10px" border-color="#12142F" />
+      <mj-navbar-link text-transform="none" color="#12142F" padding="2px 4px" text-decoration="underline" target="_self" />
+      <mj-section background-color="#FFFFFF" padding="0" />
+      <mj-class name="section_header" align="center" line-height="1.2" container-background-color="#00337F" color="#FFF" />
+      <mj-class name="error_header" align="center" line-height="1.2" container-background-color="#DA0021" color="#FFF" />
+      <mj-class name="info_header" align="center" line-height="1.2" container-background-color="#0047B2" color="#FFF" />
+      <mj-class name="footer_text" align="center" line-height="1.2" color="#FFF" />
+      <mj-class name="small" font-size="12px" />
+    </mj-attributes>
+    <mj-style inline="inline"> a { color: #0047B2; } .welcome { padding: 20px 0 15px; } p.title { font-weight: 600; margin-bottom: 0; margin-bottom: -8px; } .small { font-size: 12px; } .welcome li {margin-bottom:.5em;} .large { font-size: 15px; line-height:1.2; } h3, h4, no_margin { margin: 0; } ul { margin: 10px 0 0; padding: 0 20px; } .bes { color: #00337F; } .yavneh { color: #148D8B; } .croxdale { color: #4A1971; } .youth { color: #55A020; } .kids { color: #DA0021; } .women { color: #FF8900; } </mj-style>
+  </mj-head>
+  <mj-body background-color="#FFFFFF" width="700px">
+    <mj-section>
+      <mj-column>
+        <mj-spacer />
+      </mj-column>
+    </mj-section>
+    <mj-include path="./header.mjml" />
+    <mj-wrapper padding="0 1px" background-color="#12142F">
+      <mj-section css-class="welcome">
+        <mj-column>
+          <mj-text padding-bottom="0">
+            <h2>What's New at BES</h2>
+            <a href="https://onebes.uk/quick-links"><img src="https://borehamwoodshul.org/assets/uploads/2024/08/BES-Quick-Links.png" style="float:right;margin-left:20px;margin-bottom:20px;" width="160" /></a>
+            <ul>
+              <li><strong>Mizrachi Weekend of Inspiration</strong> 30 April and 1 & 2 May - see below for more details.<ul>
+                  <li><strong>In conversation with Rabbi Doron Perez</strong> Thursday 30 April, 8.15pm - 9.30pm - booking required at <a href="https://onebes.uk/woi26thurs">onebes.uk/woi26thurs</a></li>
+                  <li><strong>Women's Seudah with Rabbanit Karen Hochhauser</strong> Shabbat 2 May, 5.30pm - 7.00pm - booking required at <a href="https://onebes.uk/wss26">onebes.uk/wss26</a></li>
+                </ul>
+              </li>
+              <li><strong>AGM 2026 - Save the Date</strong> Wednesday 13 May from 8pm at the Community Hub, Croxdale Road.</li>
+              <li><strong>Standing Strong - Extinguish Antisemitism</strong> 10 May from 1pm - join the rally in central London.</li>
+              <li><strong>CRP Collection has started</strong> - registration for those collecting CRP points during 2026/27 to start school in Sept 2027 is now OPEN. You must register each child you plan to collect CRP points via synagogue attendance here: <a href="https://myus.theus.org.uk/crp-application/crp-user-login/">myus.theus.org.uk/crp-application/crp-user-login/</a><br />The CRP desk is where the sheets are handed out to those arriving to record CRP attendance. We rely on volunteers to run the desk, so please help if you can. If no one volunteers, there will be no CRP desk that day. <strong><a href="https://borehamwoodshul.org/crp-desk-sign-up">Please sign up here.</a></strong></li>
+              <li><strong class="kids">BES Kaytana is recruiting</strong> for more details and to apply visit <a href="https://onebes.uk/kaytana">onebes.uk/kaytana</a></li>
+              <li><strong>Strength & Balance is back for 2026!</strong> Thursday mornings 10-11am for all ages - book at <a href="https://onebes.uk/sb26">onebes.uk/sb26</a></li>
+              <li><strong>Weekday Service Times</strong> support our daily minyanim - times can be found on the <a href="https://sendy.usintranet.org.uk/w/0IE763huDc38zq1nH3ZcyRjQ#weekday">weekly newsletter email</a>.</li>
+            </ul>
+          </mj-text>
+          <mj-spacer />
+          <!--<mj-text padding-bottom="0">
+            <h3>BES Blog: Services Spotlight</h3>
+          <p>We are excited to feature a new section on our blog  called "Services Spotlight". Each month, one of our services will be highlighted to showcase the positive and varied options we offer across our community. We start with <strong>Shema Koleinu Women's Service</strong> which has just reached their 6th anniversary 🎉<br />You can read the feature at <a href="https://borehamwoodshul.org/blog/services-spotlight/shema-koleinu">borehamwoodshul.org/blog/services-spotlight/shema-koleinu</a></p></mj-text>
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/02/Services-Spotlight-SK-1.png" href="https://borehamwoodshul.org/blog/services-spotlight/shema-koleinu" padding-top="0" />-->
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-divider />
+          <mj-spacer height="10px" />
+          <mj-navbar base-url="">
+            <mj-navbar-link text-decoration="none"><strong>Also in this email:</strong></mj-navbar-link>
+            <mj-navbar-link href="#israel">Israel</mj-navbar-link>
+            <mj-navbar-link href="#upcoming">Events</mj-navbar-link>
+            <mj-navbar-link href="#volunteering">Volunteering</mj-navbar-link>
+            <mj-navbar-link href="#kids">Kids</mj-navbar-link>
+            <mj-navbar-link href="#crp">CRP</mj-navbar-link>
+            <mj-navbar-link href="#youth">Youth</mj-navbar-link>
+            <mj-navbar-link href="#care">BES Care</mj-navbar-link>
+          </mj-navbar>
+          <mj-spacer height="20px" />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-spacer height="10px" />
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- htmlmin:ignore --><a name="israel"></a><!-- htmlmin:ignore -->Israel
+            </h3>
+          </mj-text>
+          <mj-spacer height="10px" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/02/btm-vigil-brew.png" href="https://tinyurl.com/bwvcommunity" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2025/12/Ivrit-Classes-2026-1.jpg" href="https://onebes.uk/ivrit26" />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-spacer height="10px" />
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- htmlmin:ignore --><a name="upcoming"></a><!-- htmlmin:ignore -->Upcoming Events
+            </h3>
+          </mj-text>
+          <mj-spacer height="10px" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/04/woi-2026-thurs-2.png" href="https://onebes.uk/woi26thurs" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/04/woi-2026-1.png" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/04/woi-2026-wss-1.png" href="https://onebes.uk/wss26" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/04/WhatsApp-Image-2026-04-24-at-10.05.10.jpeg" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/03/WhatsApp-Image-2026-03-23-at-15.10.34.jpeg" href="https://onebes.uk/besw-antisemitism" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/02/SK-Year25-26.png?v2" href="https://onebes.uk/waShemaKoleinu" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2025/12/Strength-Balance.jpg" href="https://onebes.uk/sb26" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/01/PODcast-RAC.jpg" href="mailto:rabbichapper@borehamwoodshul.org?subject=PODcast" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2025/11/Tanach-Tours.jpg" href="https://chat.whatsapp.com/D7Kd3h0OgnS5PyGqWx9VDE" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2025/10/Laws-of-Shabbat-Shiur.png?v2" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2025/07/mikveh-update.jpg" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2025/02/The-Gemara-Group-Southside-Talmud.jpg" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2024/12/RGB-Daily-Dose.png" href="https://onebes.uk/daily-dose" />
+          <mj-spacer height="10px" />
+          <mj-divider />
+          <mj-text padding-top="0" padding-bottom="0">
+            <p class="title">VIBES Groups</p>
+            <p>You can find out all about our wonderful VIBES groups on the VIBES section of our website.</p>
+          </mj-text>
+          <mj-button href="https://sendy.usintranet.org.uk/w/BqfIXxV6OQ9jKciD0WjqJg">Read our March VIBES Groups Update email</mj-button>
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/03/WhatsApp-Image-2026-03-13-at-12.20.47.jpeg" href="https://onebes.uk/besvibesgroups" />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-spacer height="10px" />
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- htmlmin:ignore --><a name="volunteering"></a><!-- htmlmin:ignore -->Volunteering
+            </h3>
+          </mj-text>
+          <mj-spacer height="10px" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/03/Kaytana-2026-Ad.png" href="https://onebes.uk/kaytana" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2025/10/Drivers-for-Survivors.png?v3" href="mailto:nicola.strauther@holocaust.org.uk?subject=Drivers%20for%20Survivors" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2024/09/we-need-your-help-1.jpg" href="https://tinyurl.com/bes-security-signup" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2024/03/Willesden-Jewish-Cemetery-Flyer.png" href="https://willesdenjewishcemetery.org.uk" />
+          <mj-text><strong>Would you like to give newcomers a warm welcome at BES?</strong> Join the new Buddies Network today and help us grow our community, meet new people and create a welcoming environment. Become a buddy, or find out more by contacting <a href="mailto:welcome@borehamwoodshul.org">welcome@borehamwoodshul.org</a></mj-text>
+          <mj-image src="https://bes-website.s3.amazonaws.com/web-images/buddies-network.jpeg?mtime=20231015162340&focal=none" alt="Join the BES Buddies Network" href="mailto:welcome@borehamwoodshul.org" />
+          <mj-image src="https://bes-website.s3.amazonaws.com/web-images/welcoming-team.jpeg?mtime=20231015162339&focal=none" alt="Welcoming Team" />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-spacer height="10px" />
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- htmlmin:ignore --><a name="kids"></a><!-- htmlmin:ignore -->Kids
+            </h3>
+          </mj-text>
+          <mj-spacer height="10px" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/01/kaytana26-kids.png?v2" href="https://onebes.uk/kaytana" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2025/11/Anim-Zemirot-Club-Yavneh.jpg" />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-spacer height="10px" />
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- htmlmin:ignore --><a name="crp"></a><!-- htmlmin:ignore -->CRP - Certificate of Religious Practice
+            </h3>
+          </mj-text>
+          <mj-spacer height="15px" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/03/05_CRP_2026.jpg" href="https://www.theus.org.uk/crp" />
+          <mj-text>
+            <p class="title"><strong>Collection of CRP points to start school in Sept 2027 has started.</strong></p>
+            <p>You must register each child you plan to collect CRP points via synagogue attendance here: <a href="https://myus.theus.org.uk/crp-application/crp-user-login/">myus.theus.org.uk/crp-application/crp-user-login/</a></p>
+            <p>The dates eligible for CRP collection are between <strong>18th April 2026</strong>&nbsp;and <strong>9th January 2027</strong>&nbsp;(but please check with the school you are applying to as deadlines differ), both BES@Croxdale &amp; BES@Yavneh will be using the United Synagogue system,&nbsp;<strong>if you plan to attend both sites, you will need to register separately for each</strong>.</p>
+            <p><strong>CRP Desk</strong></p>
+            <p><span style="font-weight: 400;">The CRP desk is where the sheets are handed out to those arriving to record CRP attendance. We rely on volunteers to run the desk, so please help if you can. If no one volunteers, there will be no CRP desk that day. <strong><a href="https://borehamwoodshul.org/crp-desk-sign-up">Please sign up here.</a></strong></span></p>
+            <p>FAQ’s and more information on CRP can be found here: <a href="https://www.theus.org.uk/crp">www.theus.org.uk/crp</a> or contact <a href="mailto:crp@borehamwoodshul.org">crp@borehamwoodshul.org</a></p>
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-spacer height="10px" />
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- htmlmin:ignore --><a name="youth"></a><!-- htmlmin:ignore -->Youth
+            </h3>
+          </mj-text>
+          <mj-spacer height="10px" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2025/11/Club-NXT.png" href="mailto:rabbigreg@borehamwoodshul.org" />
+          <mj-spacer height="10px" />
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-spacer height="10px" />
+          <mj-text mj-class="section_header">
+            <h3>
+              <!-- htmlmin:ignore --><a name="care"></a><!-- htmlmin:ignore -->BES Care
+            </h3>
+          </mj-text>
+          <mj-spacer height="10px" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/03/WhatsApp-Image-2026-03-23-at-12.51.25.jpeg" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2026/04/WhatsApp-Image-2026-04-21-at-14.28.39.jpeg" href="https://theus.org.uk/singingformemory" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2024/11/chatty-cafe-jcare.jpg" />
+          <mj-image src="https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/4280d4e8-33ef-4d27-8d49-9d21325369b2/Synagogue-2/editor_images/Hardship%202.png" alt="BES Hardship Fund" href="https://www.justgiving.com/fundraising/borehamwood-hardship-fund" />
+          <mj-image src="https://borehamwoodshul.org/assets/uploads/2024/02/BESCare-Here-to-help.png" />
+          <mj-spacer height="10px" />
+          <mj-divider />
+          <mj-text padding-top="0" padding-bottom="0">
+            <p class="title">Community Dementia Programmes</p>
+            <p>Through different services, JCare help people living with dementia and their family carers to live well and access the support they need.</p>
+          </mj-text>
+          <mj-button href="https://borehamwoodshul.org/assets/uploads/2024/02/Community-Dementia-Programmes-POSTER.pdf">Download Community Dementia Programmes</mj-button>
+          <mj-text>
+            <p>If you or someone you know may benefit from some support, please contact, in confidence, Karen <a href="tel:07341005116">07341 005 116</a> / <a href="mailto:care@borehamwoodshul.org">care@borehamwoodshul.org</a></p>
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-text mj-class="section_header">
+            <h3>We look forward to welcoming you to a BES event soon!</h3>
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-include path="./footer.mjml" />
+    </mj-wrapper>
+    <mj-section>
+      <mj-column>
+        <mj-spacer />
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

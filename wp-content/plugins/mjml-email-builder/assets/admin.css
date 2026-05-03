@@ -1,0 +1,339 @@
+/* ── MJML Email Builder ── */
+
+/* ── Top bar ── */
+.mjml-eb-topbar {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 0 16px;
+	border-bottom: 1px solid #dcdcde;
+	margin-bottom: 20px;
+	flex-wrap: wrap;
+}
+.mjml-eb-back {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	color: #50575e;
+	text-decoration: none;
+	font-size: 13px;
+	white-space: nowrap;
+}
+.mjml-eb-back:hover { color: #135e96; }
+.mjml-eb-back .dashicons { font-size: 16px; width: 16px; height: 16px; margin-top: 1px; }
+
+.mjml-eb-title-input {
+	flex: 1;
+	min-width: 200px;
+	max-width: 440px;
+	font-size: 20px !important;
+	font-weight: 600;
+	height: 40px !important;
+	padding: 4px 10px !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+	background: transparent !important;
+}
+.mjml-eb-title-input:hover,
+.mjml-eb-title-input:focus {
+	border-color: #8c8f94 !important;
+	background: #fff !important;
+	box-shadow: 0 0 0 1px #8c8f94 !important;
+}
+
+.mjml-eb-save-status {
+	font-size: 12px;
+	color: #50575e;
+	min-width: 120px;
+}
+.mjml-eb-save-status[data-state="saving"] { color: #50575e; }
+.mjml-eb-save-status[data-state="saved"]  { color: #00a32a; }
+.mjml-eb-save-status[data-state="unsaved"]{ color: #996800; }
+.mjml-eb-save-status[data-state="error"]  { color: #d63638; }
+
+.mjml-eb-topbar-actions { display: flex; gap: 8px; margin-left: auto; }
+
+/* ── MJML compile warnings notice ── */
+.mjml-eb-warnings {
+	background: #fcf9e8;
+	border-left: 4px solid #dba617;
+	padding: 10px 14px;
+	margin: 0 0 16px;
+	font-size: 13px;
+	color: #1d2327;
+	border-radius: 0 3px 3px 0;
+}
+.mjml-eb-warnings ul { margin: 6px 0 0 18px; padding: 0; list-style: disc; }
+.mjml-eb-warnings li { margin: 2px 0; font-family: Menlo, Consolas, monospace; font-size: 12px; }
+
+/* ── Two-column layout ── */
+.mjml-eb-layout {
+	display: grid;
+	grid-template-columns: 1fr 600px;
+	gap: 20px;
+	align-items: start;
+}
+@media (max-width: 1480px) { .mjml-eb-layout { grid-template-columns: 1fr; } }
+
+/* ── Add blocks toolbar ── */
+.mjml-eb-add-blocks {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+	padding: 10px 14px;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 4px 4px 0 0;
+}
+.mjml-add-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: #50575e;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	margin-right: 4px;
+}
+.mjml-add-blocks .button {
+	font-size: 12px;
+	height: 28px;
+	line-height: 26px;
+	padding: 0 10px;
+}
+
+/* ── Block list ── */
+#mjml-blocks-list {
+	border: 1px solid #dcdcde;
+	border-top: none;
+	border-radius: 0 0 4px 4px;
+	background: #fff;
+}
+
+.mjml-sortable-placeholder {
+	height: 52px;
+	background: #f0f6fc;
+	border: 2px dashed #72aee6;
+	border-radius: 2px;
+	margin: 0;
+}
+
+.mjml-block-row {
+	border-bottom: 1px solid #f0f0f1;
+	position: relative;
+}
+.mjml-block-row:last-child { border-bottom: none; }
+
+.mjml-block-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 14px;
+	cursor: pointer;
+	user-select: none;
+	transition: background 80ms;
+}
+.mjml-block-header:hover { background: #f8f9fa; }
+.mjml-block-row.ui-sortable-helper { box-shadow: 0 4px 16px rgba(0,0,0,.12); border-radius: 4px; background: #fff; }
+
+.mjml-drag-handle {
+	color: #c3c4c7;
+	cursor: grab;
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	flex-shrink: 0;
+	transition: color 120ms;
+}
+.mjml-drag-handle:hover { color: #50575e; }
+.mjml-drag-handle:active { cursor: grabbing; }
+
+/* Block type badge colours */
+.mjml-block-badge {
+	font-size: 11px;
+	font-weight: 600;
+	color: #fff;
+	padding: 2px 8px;
+	border-radius: 10px;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+.mjml-type-navbar         { background: #6b3a9c; }
+.mjml-type-section_header { background: #007a6a; }
+.mjml-type-text           { background: #2271b1; }
+.mjml-type-image          { background: #0a7227; }
+.mjml-type-button         { background: #c9580d; }
+.mjml-type-divider        { background: #50575e; }
+.mjml-type-spacer         { background: #9ea3a8; }
+.mjml-type-raw            { background: #1d2327; }
+
+.mjml-block-summary {
+	flex: 1;
+	font-size: 12px;
+	color: #646970;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.mjml-block-row:has(.mjml-type-section_header) .mjml-block-summary {
+	font-size: 14px;
+	font-weight: 600;
+	color: #1d2327;
+}
+
+.mjml-block-toggle,
+.mjml-delete-block {
+	flex-shrink: 0;
+	color: #646970 !important;
+	padding: 0 !important;
+	min-height: 0 !important;
+	text-decoration: none !important;
+	box-shadow: none !important;
+	transition: color 120ms;
+}
+.mjml-block-toggle:hover,
+.mjml-block-toggle:focus { color: #2271b1 !important; text-decoration: none !important; box-shadow: none !important; }
+.mjml-delete-block:hover,
+.mjml-delete-block:focus { color: #d63638 !important; text-decoration: none !important; box-shadow: none !important; }
+.mjml-block-toggle .dashicons,
+.mjml-delete-block .dashicons { font-size: 18px; width: 18px; height: 18px; vertical-align: middle; }
+
+/* ── Block fields ── */
+.mjml-block-fields {
+	padding: 14px 20px 16px;
+	border-top: 1px solid #f0f0f1;
+	background: #fafafa;
+}
+
+.mjml-field-row { margin: 0 0 12px; }
+.mjml-field-row:last-child { margin-bottom: 0; }
+
+.mjml-field-label {
+	display: block;
+	font-size: 12px;
+	font-weight: 600;
+	color: #1d2327;
+	margin-bottom: 4px;
+}
+
+.mjml-checkbox-label {
+	font-size: 13px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.mjml-field-note {
+	font-size: 12px;
+	color: #50575e;
+	font-style: italic;
+	margin: 0 0 10px;
+}
+
+.mjml-navbar-preview {
+	padding: 8px 12px;
+	background: #f0f0f1;
+	border-radius: 3px;
+	font-size: 12px;
+	color: #50575e;
+}
+
+/* ── Empty states ── */
+.mjml-empty-blocks {
+	text-align: center;
+	padding: 40px 20px;
+	color: #646970;
+	font-style: italic;
+	margin: 0;
+	border: 1px solid #dcdcde;
+	border-top: none;
+	background: #fff;
+}
+
+.mjml-empty-state {
+	text-align: center;
+	padding: 60px 20px;
+	color: #646970;
+}
+.mjml-empty-state .dashicons {
+	font-size: 48px;
+	width: 48px;
+	height: 48px;
+	display: block;
+	margin: 0 auto 12px;
+	color: #c3c4c7;
+}
+.mjml-empty-state p { font-size: 15px; margin-bottom: 16px; }
+
+/* ── TinyMCE container ── */
+.mjml-text-editor { width: 100% !important; }
+.mce-container, .mce-container * { box-sizing: content-box; }
+
+/* ── Image preview info icon + hover thumbnail ── */
+.mjml-image-info {
+	position: relative;
+	flex-shrink: 0;
+	color: #646970 !important;
+	padding: 0 !important;
+	min-height: 0 !important;
+	background: none;
+	border: none;
+	text-decoration: none !important;
+	box-shadow: none !important;
+	cursor: help;
+}
+.mjml-image-info:hover,
+.mjml-image-info:focus { color: #2271b1 !important; text-decoration: none !important; box-shadow: none !important; }
+.mjml-image-info .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	vertical-align: middle;
+}
+.mjml-image-thumb {
+	position: absolute;
+	top: calc(100% + 6px);
+	right: 0;
+	z-index: 100;
+	display: none;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	box-shadow: 0 4px 12px rgba(0,0,0,.12);
+	padding: 6px;
+	border-radius: 3px;
+	pointer-events: none;
+}
+.mjml-image-thumb.is-visible { display: block; }
+.mjml-image-thumb img {
+	display: block;
+	max-width: 240px;
+	max-height: 240px;
+}
+
+/* ── Output panel ── */
+.mjml-eb-output.postbox { margin: 0; }
+.mjml-eb-output .postbox-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 16px;
+	border-bottom: 1px solid #dcdcde;
+}
+.mjml-eb-output .postbox-header h2 { font-size: 14px; margin: 0; padding: 0; border: none; }
+.mjml-eb-output .inside { padding: 0; margin: 0; background: #f0f0f1; }
+
+#mjml-preview-frame {
+	border: none;
+	display: block;
+	background: #fff;
+	width: 100%;
+	height: 800px;
+}
+
+/* ── List page ── */
+.wp-list-table .row-actions { font-size: 12px; }
+.wp-list-table .row-actions .delete a { color: #b32d2e; }
+
+/* ── Settings page ── */
+.wrap .mjml-settings-section { margin-bottom: 28px; }
+.wrap .mjml-settings-section h2 { font-size: 15px; margin: 0 0 4px; }
+.wrap .description { margin-bottom: 8px; }
