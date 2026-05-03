@@ -1,0 +1,38 @@
+# WordPress core — managed by Studio, not custom code
+wp-admin/
+wp-includes/
+wp-*.php
+xmlrpc.php
+license.txt
+readme.html
+index.php
+
+# Sensitive config
+wp-config.php
+wp-config-sample.php
+
+# SQLite database
+wp-content/database/
+
+# Uploads and generated files
+wp-content/uploads/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+
+# Bundled plugins (not custom)
+wp-content/plugins/akismet/
+wp-content/plugins/hello.php
+wp-content/plugins/index.php
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Node (if ever added)
+node_modules/
