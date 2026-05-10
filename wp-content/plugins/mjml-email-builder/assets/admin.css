@@ -41,6 +41,20 @@
 	box-shadow: 0 0 0 1px #8c8f94 !important;
 }
 
+.mjml-eb-template-badge {
+	display: inline-block;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #1d4ed8;
+	background: #dbeafe;
+	border-radius: 3px;
+	padding: 3px 8px;
+	line-height: 1;
+}
+.mjml-eb-template-badge[hidden] { display: none; }
+
 .mjml-eb-save-status {
 	font-size: 12px;
 	color: #50575e;
@@ -51,7 +65,11 @@
 .mjml-eb-save-status[data-state="unsaved"]{ color: #996800; }
 .mjml-eb-save-status[data-state="error"]  { color: #d63638; }
 
-.mjml-eb-topbar-actions { display: flex; gap: 8px; margin-left: auto; }
+.mjml-eb-topbar-actions { display: flex; gap: 8px; margin-left: auto; align-items: center; }
+.mjml-eb-theme-label { font-size: 12px; color: #50575e; margin-right: -4px; }
+#mjml-theme-select { height: 30px; max-width: 180px; }
+#mjml-undo-btn { display: inline-flex; align-items: center; gap: 4px; }
+#mjml-undo-btn .dashicons { font-size: 16px; width: 16px; height: 16px; }
 
 /* ── MJML compile warnings notice ── */
 .mjml-eb-warnings {
@@ -85,6 +103,12 @@
 	background: #f6f7f7;
 	border: 1px solid #dcdcde;
 	border-radius: 4px 4px 0 0;
+	position: sticky;
+	top: 32px; /* sit below the WP admin bar */
+	z-index: 50;
+}
+@media screen and (max-width: 782px) {
+	.mjml-eb-add-blocks { top: 46px; } /* WP admin bar is taller on small screens */
 }
 .mjml-add-label {
 	font-size: 12px;
@@ -165,6 +189,11 @@
 .mjml-type-divider        { background: #50575e; }
 .mjml-type-spacer         { background: #9ea3a8; }
 .mjml-type-raw            { background: #1d2327; }
+.mjml-type-shabbat_times    { background: #00337F; }
+.mjml-type-service_list     { background: #148D8B; }
+.mjml-type-service_list_two { background: #148D8B; }
+.mjml-type-notice_list      { background: #DA0021; }
+.mjml-type-yahrzeit_list    { background: #4A1971; }
 
 .mjml-block-summary {
 	flex: 1;
@@ -181,7 +210,8 @@
 }
 
 .mjml-block-toggle,
-.mjml-delete-block {
+.mjml-delete-block,
+.mjml-clear-block-content {
 	flex-shrink: 0;
 	color: #646970 !important;
 	padding: 0 !important;
@@ -194,8 +224,11 @@
 .mjml-block-toggle:focus { color: #2271b1 !important; text-decoration: none !important; box-shadow: none !important; }
 .mjml-delete-block:hover,
 .mjml-delete-block:focus { color: #d63638 !important; text-decoration: none !important; box-shadow: none !important; }
+.mjml-clear-block-content:hover,
+.mjml-clear-block-content:focus { color: #996800 !important; text-decoration: none !important; box-shadow: none !important; }
 .mjml-block-toggle .dashicons,
-.mjml-delete-block .dashicons { font-size: 18px; width: 18px; height: 18px; vertical-align: middle; }
+.mjml-delete-block .dashicons,
+.mjml-clear-block-content .dashicons { font-size: 18px; width: 18px; height: 18px; vertical-align: middle; }
 
 /* ── Block fields ── */
 .mjml-block-fields {
@@ -264,9 +297,78 @@
 }
 .mjml-empty-state p { font-size: 15px; margin-bottom: 16px; }
 
+/* ── Repeating-item editors (Shabbat Times, Service List) ── */
+.mjml-repeat { margin: 8px 0 14px; }
+.mjml-repeat .mjml-field-label { display: block; margin-bottom: 6px; }
+.mjml-repeat-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.mjml-repeat-row {
+	display: grid;
+	grid-template-columns: 1.2fr 1fr 80px 1.5fr auto;
+	gap: 6px;
+	align-items: center;
+	background: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 3px;
+	padding: 6px;
+}
+.mjml-repeat-row input[type="text"] {
+	width: 100%;
+	min-width: 0;
+}
+.mjml-repeat-row select { min-width: 0; }
+.mjml-svc-bold-label { font-size: 12px; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+.mjml-svc-del {
+	color: #b32d2e !important;
+	font-size: 18px;
+	line-height: 1;
+	padding: 0 4px !important;
+	text-decoration: none !important;
+	box-shadow: none !important;
+}
+.mjml-svc-del:hover { color: #d63638 !important; }
+.mjml-svc-add { font-size: 12px; }
+
+.mjml-twocol-svc { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.mjml-twocol-side h4 { margin: 0 0 6px; font-size: 13px; }
+.mjml-twocol-title-row { display: flex; gap: 6px; margin-bottom: 8px; }
+.mjml-twocol-title { flex: 1; }
+.mjml-twocol-side .mjml-repeat-row { grid-template-columns: auto 1fr 1fr 70px 1fr auto auto; }
+.mjml-svc-drag {
+	color: #8c8f94;
+	cursor: grab;
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+	flex-shrink: 0;
+}
+.mjml-svc-drag:hover { color: #50575e; }
+.mjml-svc-drag:active { cursor: grabbing; }
+.mjml-svc-dup {
+	color: #646970 !important;
+	padding: 0 4px !important;
+	text-decoration: none !important;
+	box-shadow: none !important;
+	min-height: 0 !important;
+}
+.mjml-svc-dup:hover { color: #2271b1 !important; }
+.mjml-svc-dup .dashicons { font-size: 16px; width: 16px; height: 16px; }
+
+@media (max-width: 980px) {
+	.mjml-repeat-row { grid-template-columns: 1fr 1fr; }
+	.mjml-twocol-svc { grid-template-columns: 1fr; }
+}
+
 /* ── TinyMCE container ── */
-.mjml-text-editor { width: 100% !important; }
+.mjml-text-editor,
+.mjml-inline-wysiwyg { width: 100% !important; }
+.mjml-inline-wysiwyg-row { display: block; }
+.mjml-inline-wysiwyg-row .mjml-field-label { display: block; margin-bottom: 4px; }
 .mce-container, .mce-container * { box-sizing: content-box; }
+
+/* Let the menu item's class colour drive the text colour in the default
+   (non-hover) state. TinyMCE's hover/selected styling is left untouched. */
+.mce-menu .mce-menu-item .mce-text { color: inherit; }
 
 /* ── Image preview info icon + hover thumbnail ── */
 .mjml-image-info {
@@ -310,7 +412,15 @@
 }
 
 /* ── Output panel ── */
-.mjml-eb-output.postbox { margin: 0; }
+.mjml-eb-output.postbox {
+	margin: 0;
+	position: sticky;
+	top: 32px; /* sit below the WP admin bar */
+	align-self: start;
+}
+@media screen and (max-width: 782px) {
+	.mjml-eb-output.postbox { top: 46px; }
+}
 .mjml-eb-output .postbox-header {
 	display: flex;
 	align-items: center;
@@ -326,7 +436,9 @@
 	display: block;
 	background: #fff;
 	width: 100%;
-	height: 800px;
+	height: calc(100vh - 140px); /* fit within viewport so the whole panel stays sticky */
+	min-height: 400px;
+	max-height: 900px;
 }
 
 /* ── List page ── */
@@ -337,3 +449,28 @@
 .wrap .mjml-settings-section { margin-bottom: 28px; }
 .wrap .mjml-settings-section h2 { font-size: 15px; margin: 0 0 4px; }
 .wrap .description { margin-bottom: 8px; }
+
+.mjml-default-badge {
+	display: inline-block;
+	background: #00a32a;
+	color: #fff;
+	font-size: 11px;
+	font-weight: 600;
+	padding: 1px 8px;
+	border-radius: 10px;
+	margin-left: 8px;
+	vertical-align: middle;
+}
+.mjml-link-danger { color: #b32d2e !important; }
+.mjml-link-danger:hover { color: #b32d2e !important; text-decoration: underline !important; }
+
+.mjml-eb-impexp { display: flex; gap: 24px; flex-wrap: wrap; }
+.mjml-eb-impexp-block {
+	flex: 1;
+	min-width: 280px;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	padding: 16px;
+}
+.mjml-eb-impexp-block h3 { margin-top: 0; }

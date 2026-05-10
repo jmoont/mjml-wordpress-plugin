@@ -36,3 +36,6 @@ Thumbs.db
 
 # Node (if ever added)
 node_modules/
+
+# Claude Code working dirs
+.claude/worktrees/
