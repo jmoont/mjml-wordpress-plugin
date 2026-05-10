@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MJML Email Builder
  * Description: Build MJML email templates with a visual block editor and compile to HTML in the browser.
- * Version: 2.1.0
+ * Version: 2.1.1
  * Requires at least: 5.8
  * Requires PHP: 7.4
  * Author: Josh Moont — BES Chair
@@ -13,7 +13,7 @@ if ( ! function_exists( 'add_action' ) ) {
 	exit;
 }
 
-define( 'MJML_EB_VERSION', '2.1.0' );
+define( 'MJML_EB_VERSION', '2.1.1' );
 define( 'MJML_EB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MJML_EB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 

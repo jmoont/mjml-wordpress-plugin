@@ -4,7 +4,7 @@ Tags: mjml, email, templates, newsletter
 Requires at least: 5.8
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -73,6 +73,9 @@ Use **Settings → Export** to download a JSON bundle containing your themes plu
 Yes. The preview iframe runs with `sandbox="allow-same-origin"` only — scripts inside the email cannot execute. Email clients don't run scripts either, so this matches real-world behaviour.
 
 == Changelog ==
+
+= 2.1.1 =
+* Maintenance release.
 
 = 2.1.0 =
 * New "Template" post status with a Templates tab — save any email as a template, then create new emails from it via "Use this template".
