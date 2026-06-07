@@ -14,8 +14,10 @@
 !/STUDIO.md
 !/mjml-email-builder.zip
 
-# Claude's transient worktrees are never tracked, even though .claude/ is.
+# Claude's transient worktrees and machine-local settings are never tracked,
+# even though .claude/ otherwise is.
 /.claude/worktrees/
+/.claude/settings.local.json
 
 # ── Descend into wp-content for the custom plugin only ─────────────────────
 !/wp-content/
