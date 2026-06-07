@@ -4,7 +4,7 @@ Tags: mjml, email, templates, newsletter
 Requires at least: 5.8
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 2.4.6
+Stable tag: 2.4.12
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -73,6 +73,9 @@ Use **Settings → Export** to download a JSON bundle containing your themes plu
 Yes. The preview iframe runs with `sandbox="allow-same-origin"` only — scripts inside the email cannot execute. Email clients don't run scripts either, so this matches real-world behaviour.
 
 == Changelog ==
+
+= 2.4.12 =
+* Settings: new "Import full MJML" helper on the theme editor. Paste a complete `<mjml>` document and click "Split into fields" to auto-populate Global Styles (from `<mj-head>`), Header, and Footer. A literal `[BLOCKS]` placeholder inside `<mj-body>` marks where per-email content goes: everything before it becomes the Header, everything after becomes the Footer. When you open an existing theme, the import box is auto-filled with the reconstructed full document (header, `[BLOCKS]`, footer) so you can view/edit it whole and re-split, and the preview is generated automatically. The "Preview" renders the theme in a sandboxed iframe with sample blocks laid out across two sections — welcome, update, navbar, section headers, text, button, two-col images, feature, spacer, image, shabbat times, service lists, notices, yahrzeits and raw — so you can see the theme fully exercised without building an email. Note: `<mj-body>` attributes (e.g. background-color) aren't stored by themes and are dropped with a warning on split.
 
 = 2.4.6 =
 * Update block: link recolouring now reads the highlight style's own text colour from Settings (the `color` on the matching `<mj-class>`, e.g. error_header → #FFF) instead of always using white. This means custom highlight styles with a different text colour are supported — links match whatever the style defines. If a style sets no colour, links are left as-is.
