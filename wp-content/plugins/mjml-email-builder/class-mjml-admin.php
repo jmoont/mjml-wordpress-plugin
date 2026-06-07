@@ -118,6 +118,25 @@ class MJML_Admin {
 			$js_deps[] = 'editor';
 		}
 
+		if ( $settings_hook === $hook_suffix ) {
+			// MJML browser compiler — powers the theme "Sample preview" on Settings.
+			wp_enqueue_script(
+				'mjml-browser',
+				'https://cdn.jsdelivr.net/npm/mjml-browser@4.18.0/lib/index.js',
+				array(),
+				null,
+				true
+			);
+			// Theme import/split + sample-preview helper (Settings page only).
+			wp_enqueue_script(
+				'mjml-eb-settings',
+				MJML_EB_PLUGIN_URL . 'assets/settings.js',
+				array( 'jquery', 'mjml-browser' ),
+				MJML_EB_VERSION,
+				true
+			);
+		}
+
 		wp_enqueue_script(
 			'mjml-eb-admin',
 			MJML_EB_PLUGIN_URL . 'assets/admin.js',

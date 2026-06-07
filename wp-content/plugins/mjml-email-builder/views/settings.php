@@ -61,20 +61,44 @@ $editing     = $is_new ? array( 'name' => '', 'styles' => '', 'header' => '', 'f
 				</tr>
 			</table>
 
+			<h3><?php esc_html_e( 'Import full MJML', 'mjml-email-builder' ); ?></h3>
+			<p class="description">
+				<?php esc_html_e( 'Paste a complete <mjml> document, then click Split to fill the three fields below. Put a literal [BLOCKS] placeholder inside <mj-body> where per-email content goes: everything before it becomes the Header, everything after becomes the Footer. The <mj-head> contents become Global Styles. Use Preview to render the theme with sample blocks.', 'mjml-email-builder' ); ?>
+			</p>
+			<textarea id="mjml-eb-import-src" rows="10" class="large-text code" placeholder="&lt;mjml&gt;
+  &lt;mj-head&gt;…&lt;/mj-head&gt;
+  &lt;mj-body&gt;
+    &lt;!-- header sections --&gt;
+    [BLOCKS]
+    &lt;!-- footer sections --&gt;
+  &lt;/mj-body&gt;
+&lt;/mjml&gt;"></textarea>
+			<p>
+				<button type="button" class="button" id="mjml-eb-split-btn"><?php esc_html_e( 'Split into fields', 'mjml-email-builder' ); ?></button>
+				<button type="button" class="button" id="mjml-eb-preview-btn"><?php esc_html_e( 'Preview', 'mjml-email-builder' ); ?></button>
+			</p>
+			<div id="mjml-eb-import-msg" class="notice" hidden style="margin:8px 0;padding:8px 12px"></div>
+
 			<h3><?php esc_html_e( 'Global Styles', 'mjml-email-builder' ); ?></h3>
 			<p class="description"><?php esc_html_e( 'Contents of <mj-head> — include <mj-font>, <mj-attributes>, <mj-style> etc.', 'mjml-email-builder' ); ?></p>
-			<textarea name="styles" rows="12" class="large-text code"><?php echo esc_textarea( $editing['styles'] ); ?></textarea>
+			<textarea id="mjml-eb-styles" name="styles" rows="12" class="large-text code"><?php echo esc_textarea( $editing['styles'] ); ?></textarea>
 
 			<h3><?php esc_html_e( 'Global Header', 'mjml-email-builder' ); ?></h3>
 			<p class="description"><?php esc_html_e( 'Raw <mj-section> blocks placed at the top of every email, before your template blocks.', 'mjml-email-builder' ); ?></p>
-			<textarea name="header" rows="10" class="large-text code"><?php echo esc_textarea( $editing['header'] ); ?></textarea>
+			<textarea id="mjml-eb-header" name="header" rows="10" class="large-text code"><?php echo esc_textarea( $editing['header'] ); ?></textarea>
 
 			<h3><?php esc_html_e( 'Global Footer', 'mjml-email-builder' ); ?></h3>
 			<p class="description"><?php esc_html_e( 'Raw <mj-section> blocks placed at the bottom of every email, after your template blocks.', 'mjml-email-builder' ); ?></p>
-			<textarea name="footer" rows="10" class="large-text code"><?php echo esc_textarea( $editing['footer'] ); ?></textarea>
+			<textarea id="mjml-eb-footer" name="footer" rows="10" class="large-text code"><?php echo esc_textarea( $editing['footer'] ); ?></textarea>
 
 			<?php submit_button( $is_new ? __( 'Create theme', 'mjml-email-builder' ) : __( 'Save theme', 'mjml-email-builder' ) ); ?>
 		</form>
+
+		<div id="mjml-eb-preview-panel" hidden style="margin-top:16px">
+			<h3><?php esc_html_e( 'Sample preview', 'mjml-email-builder' ); ?></h3>
+			<p class="description"><?php esc_html_e( 'The theme rendered with sample blocks in place of [BLOCKS]. Not saved.', 'mjml-email-builder' ); ?></p>
+			<iframe id="mjml-eb-preview-frame" sandbox="allow-same-origin" title="Theme preview" style="width:100%;height:600px;border:1px solid #ccd0d4;background:#fff"></iframe>
+		</div>
 
 	<?php else : ?>
 
