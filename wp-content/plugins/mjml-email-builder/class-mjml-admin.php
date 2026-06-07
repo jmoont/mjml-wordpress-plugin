@@ -103,7 +103,7 @@ class MJML_Admin {
 			// MJML browser compiler — loaded from CDN
 			wp_enqueue_script(
 				'mjml-browser',
-				'https://cdn.jsdelivr.net/npm/mjml-browser@4/lib/index.js',
+				'https://cdn.jsdelivr.net/npm/mjml-browser@4.18.0/lib/index.js',
 				array(),
 				null,
 				true
@@ -126,14 +126,16 @@ class MJML_Admin {
 			true
 		);
 
-		$template_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
-		$blocks_json = '[]';
-		$theme_id    = MJML_Themes::default_id();
+		$template_id   = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
+		$blocks_json   = '[]';
+		$theme_id      = MJML_Themes::default_id();
+		$compiled_html = '';
 		if ( $template_id ) {
 			$post = get_post( $template_id );
 			if ( $post && MJML_Post_Type::POST_TYPE === $post->post_type ) {
-				$blocks_json = $post->post_content ?: '[]';
-				$theme_id    = MJML_Themes::get_id_for_post( $template_id );
+				$blocks_json   = $post->post_content ?: '[]';
+				$theme_id      = MJML_Themes::get_id_for_post( $template_id );
+				$compiled_html = (string) get_post_meta( $template_id, 'mjml_compiled_html', true );
 			}
 		}
 
@@ -150,7 +152,10 @@ class MJML_Admin {
 			);
 		}
 
-		wp_localize_script( 'mjml-eb-admin', 'mjmlEb', array(
+		// NOTE: not using wp_localize_script — it runs html_entity_decode() on every
+		// scalar, which corrupts blocksJson when user content contains HTML entities
+		// like &quot; (common in pasted Word/Outlook markup with data-* attributes).
+		$mjml_eb = array(
 			'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
 			'nonces'        => array(
 				'save'      => wp_create_nonce( self::NONCE_SAVE ),
@@ -163,6 +168,7 @@ class MJML_Admin {
 			'themes'        => $themes_js,
 			'activeTheme'   => $theme_id,
 			'blocksJson'    => $blocks_json,
+			'compiledHtml'  => $compiled_html,
 			'i18n'          => array(
 				'saving'     => __( 'Saving…', 'mjml-email-builder' ),
 				'saved'      => __( 'All changes saved', 'mjml-email-builder' ),
@@ -173,7 +179,12 @@ class MJML_Admin {
 				'confirmDel' => __( 'Delete this email?', 'mjml-email-builder' ),
 				'unsaved'    => __( 'Unsaved changes', 'mjml-email-builder' ),
 			),
-		) );
+		);
+		wp_add_inline_script(
+			'mjml-eb-admin',
+			'var mjmlEb = ' . wp_json_encode( $mjml_eb ) . ';',
+			'before'
+		);
 	}
 
 	// ── Page callbacks ────────────────────────────────────────────────────────
@@ -186,9 +197,9 @@ class MJML_Admin {
 			case 'archived':
 				$current_status = MJML_Post_Type::STATUS_ARCHIVED;
 				break;
-			case 'template':
-				$current_status = MJML_Post_Type::STATUS_TEMPLATE;
-				break;
+			// Template feature disabled (v2.4.3): the 'template' route is no longer
+			// served — superseded by the per-block hide toggle. Backend handlers and
+			// the post status remain registered so existing template posts persist.
 			default:
 				$current_status = 'publish';
 		}

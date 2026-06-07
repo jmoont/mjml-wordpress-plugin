@@ -194,6 +194,8 @@
 .mjml-type-service_list_two { background: #148D8B; }
 .mjml-type-notice_list      { background: #DA0021; }
 .mjml-type-yahrzeit_list    { background: #4A1971; }
+.mjml-type-vibes            { background: #d8336b; }
+.mjml-type-update           { background: #b26a00; }
 
 .mjml-block-summary {
 	flex: 1;
@@ -211,7 +213,9 @@
 
 .mjml-block-toggle,
 .mjml-delete-block,
-.mjml-clear-block-content {
+.mjml-clear-block-content,
+.mjml-lock-block,
+.mjml-hide-block {
 	flex-shrink: 0;
 	color: #646970 !important;
 	padding: 0 !important;
@@ -226,9 +230,42 @@
 .mjml-delete-block:focus { color: #d63638 !important; text-decoration: none !important; box-shadow: none !important; }
 .mjml-clear-block-content:hover,
 .mjml-clear-block-content:focus { color: #996800 !important; text-decoration: none !important; box-shadow: none !important; }
+.mjml-lock-block:hover,
+.mjml-lock-block:focus { color: #2271b1 !important; text-decoration: none !important; box-shadow: none !important; }
+.mjml-lock-block.is-locked { color: #c9580d !important; }
+.mjml-lock-block.is-locked:hover,
+.mjml-lock-block.is-locked:focus { color: #996800 !important; }
+.mjml-hide-block:hover,
+.mjml-hide-block:focus { color: #2271b1 !important; text-decoration: none !important; box-shadow: none !important; }
+.mjml-hide-block.is-hidden { color: #c9580d !important; }
+.mjml-hide-block.is-hidden:hover,
+.mjml-hide-block.is-hidden:focus { color: #996800 !important; }
 .mjml-block-toggle .dashicons,
 .mjml-delete-block .dashicons,
-.mjml-clear-block-content .dashicons { font-size: 18px; width: 18px; height: 18px; vertical-align: middle; }
+.mjml-clear-block-content .dashicons,
+.mjml-lock-block .dashicons,
+.mjml-hide-block .dashicons { font-size: 18px; width: 18px; height: 18px; vertical-align: middle; }
+
+/* Locked blocks hide the destructive/move controls — unlock to access. The
+ * drag handle is the sortable's only drag-initiator (see handle: '.mjml-drag-handle'
+ * in admin.js), so hiding it also prevents reordering. */
+.mjml-block-row.is-locked .mjml-delete-block,
+.mjml-block-row.is-locked .mjml-clear-block-content,
+.mjml-block-row.is-locked .mjml-drag-handle { display: none; }
+
+/* Hidden blocks: dim the row and stripe the header so it's obvious at a glance
+ * that they're excluded from compile. Fields stay editable. The eye-icon button
+ * itself keeps full opacity so the un-hide control is easy to find. */
+.mjml-block-row.is-hidden > .mjml-block-header {
+	opacity: 0.55;
+	background-image: repeating-linear-gradient(
+		45deg,
+		transparent 0 6px,
+		rgba( 0, 0, 0, 0.04 ) 6px 12px
+	);
+}
+.mjml-block-row.is-hidden > .mjml-block-header .mjml-block-summary { font-style: italic; }
+.mjml-block-row.is-hidden > .mjml-block-header .mjml-hide-block { opacity: 1; }
 
 /* ── Block fields ── */
 .mjml-block-fields {
@@ -303,7 +340,7 @@
 .mjml-repeat-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
 .mjml-repeat-row {
 	display: grid;
-	grid-template-columns: 1.2fr 1fr 80px 1.5fr auto;
+	grid-template-columns: 1.2fr 1fr 80px 1.5fr auto auto;
 	gap: 6px;
 	align-items: center;
 	background: #fff;
@@ -332,7 +369,7 @@
 .mjml-twocol-side h4 { margin: 0 0 6px; font-size: 13px; }
 .mjml-twocol-title-row { display: flex; gap: 6px; margin-bottom: 8px; }
 .mjml-twocol-title { flex: 1; }
-.mjml-twocol-side .mjml-repeat-row { grid-template-columns: auto 1fr 1fr 70px 1fr auto auto; }
+.mjml-twocol-side .mjml-repeat-row { grid-template-columns: auto 1fr 1fr 70px 1fr auto auto auto; }
 .mjml-svc-drag {
 	color: #8c8f94;
 	cursor: grab;
@@ -344,7 +381,8 @@
 }
 .mjml-svc-drag:hover { color: #50575e; }
 .mjml-svc-drag:active { cursor: grabbing; }
-.mjml-svc-dup {
+.mjml-svc-dup,
+.mjml-svc-hide {
 	color: #646970 !important;
 	padding: 0 4px !important;
 	text-decoration: none !important;
@@ -352,7 +390,23 @@
 	min-height: 0 !important;
 }
 .mjml-svc-dup:hover { color: #2271b1 !important; }
-.mjml-svc-dup .dashicons { font-size: 16px; width: 16px; height: 16px; }
+.mjml-svc-hide:hover { color: #2271b1 !important; }
+.mjml-svc-hide.is-hidden { color: #c9580d !important; }
+.mjml-svc-hide.is-hidden:hover { color: #996800 !important; }
+.mjml-svc-dup .dashicons,
+.mjml-svc-hide .dashicons { font-size: 16px; width: 16px; height: 16px; }
+
+/* Hidden service items: dim/stripe the row so it's clear they won't render.
+ * The hide button itself keeps full opacity so the un-hide control is easy to find. */
+.mjml-repeat-row.is-hidden {
+	opacity: 0.55;
+	background-image: repeating-linear-gradient(
+		45deg,
+		transparent 0 6px,
+		rgba( 0, 0, 0, 0.04 ) 6px 12px
+	);
+}
+.mjml-repeat-row.is-hidden .mjml-svc-hide { opacity: 1; }
 
 @media (max-width: 980px) {
 	.mjml-repeat-row { grid-template-columns: 1fr 1fr; }

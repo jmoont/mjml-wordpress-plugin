@@ -19,9 +19,7 @@ $template_url = add_query_arg( 'status', 'template', $base_url );
 		<li><a href="<?php echo esc_url( $base_url ); ?>" class="<?php echo $is_published ? 'current' : ''; ?>">
 			<?php esc_html_e( 'Published', 'mjml-email-builder' ); ?> <span class="count">(<?php echo (int) $count_pub; ?>)</span>
 		</a> |</li>
-		<li><a href="<?php echo esc_url( $template_url ); ?>" class="<?php echo $is_template ? 'current' : ''; ?>">
-			<?php esc_html_e( 'Templates', 'mjml-email-builder' ); ?> <span class="count">(<?php echo (int) $count_tpl; ?>)</span>
-		</a> |</li>
+		<?php /* Template feature disabled (v2.4.3): "Templates" tab removed — superseded by the per-block hide toggle. */ ?>
 		<li><a href="<?php echo esc_url( $archive_url ); ?>" class="<?php echo $is_archived ? 'current' : ''; ?>">
 			<?php esc_html_e( 'Archived', 'mjml-email-builder' ); ?> <span class="count">(<?php echo (int) $count_arc; ?>)</span>
 		</a></li>
@@ -75,7 +73,7 @@ $template_url = add_query_arg( 'status', 'template', $base_url );
 								<span class="delete"><a href="#" class="mjml-delete-template" data-id="<?php echo esc_attr( $t->ID ); ?>"><?php esc_html_e( 'Delete permanently', 'mjml-email-builder' ); ?></a></span>
 							<?php else : ?>
 								<span class="duplicate"><a href="#" class="mjml-duplicate-template" data-id="<?php echo esc_attr( $t->ID ); ?>"><?php esc_html_e( 'Duplicate', 'mjml-email-builder' ); ?></a> | </span>
-								<span class="templatize"><a href="#" class="mjml-templatize-template" data-id="<?php echo esc_attr( $t->ID ); ?>"><?php esc_html_e( 'Save as template', 'mjml-email-builder' ); ?></a> | </span>
+								<?php /* Template feature disabled (v2.4.3): "Save as template" row action removed. */ ?>
 								<span class="archive"><a href="#" class="mjml-archive-template" data-id="<?php echo esc_attr( $t->ID ); ?>"><?php esc_html_e( 'Archive', 'mjml-email-builder' ); ?></a> | </span>
 								<span class="delete"><a href="#" class="mjml-delete-template" data-id="<?php echo esc_attr( $t->ID ); ?>"><?php esc_html_e( 'Delete', 'mjml-email-builder' ); ?></a></span>
 							<?php endif; ?>

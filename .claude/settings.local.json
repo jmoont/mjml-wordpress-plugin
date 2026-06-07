@@ -16,7 +16,9 @@
       "Bash(php -l /Users/joshm/Studio/mjml-plugin-dev/wp-content/plugins/mjml-email-builder/views/edit-template.php)",
       "Bash(studio site *)",
       "Bash(node -c /Users/joshm/Studio/mjml-plugin-dev/wp-content/plugins/mjml-email-builder/assets/admin.js)",
-      "Bash(git *)"
+      "Bash(git *)",
+      "Bash(zip -r mjml-email-builder.zip mjml-email-builder -x \"*.DS_Store\")",
+      "Bash(zip -rq mjml-email-builder.zip mjml-email-builder -x \"*.DS_Store\" \"*/.*\")"
     ]
   }
 }

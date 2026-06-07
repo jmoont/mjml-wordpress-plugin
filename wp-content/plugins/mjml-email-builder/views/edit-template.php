@@ -25,12 +25,7 @@ $is_template = $template && MJML_Post_Type::STATUS_TEMPLATE === $template->post_
 			<button id="mjml-clear-all-btn" class="button" title="<?php esc_attr_e( 'Blank the content of every block (keeps structure)', 'mjml-email-builder' ); ?>">
 				<?php esc_html_e( 'Clear all content', 'mjml-email-builder' ); ?>
 			</button>
-			<button id="mjml-templatize-btn" class="button"<?php echo $is_template ? ' hidden' : ''; ?>>
-				<?php esc_html_e( 'Save as template', 'mjml-email-builder' ); ?>
-			</button>
-			<button id="mjml-use-template-btn" class="button button-primary"<?php echo $is_template ? '' : ' hidden'; ?>>
-				<?php esc_html_e( 'Use this template', 'mjml-email-builder' ); ?>
-			</button>
+			<?php /* Template feature disabled (v2.4.3): "Save as template" / "Use this template" removed from the UI — superseded by the per-block hide toggle. Backend handlers remain so existing template posts are preserved. */ ?>
 			<button id="mjml-copy-mjml-btn" class="button"><?php esc_html_e( 'Copy MJML', 'mjml-email-builder' ); ?></button>
 			<button id="mjml-convert-btn" class="button button-primary"><?php esc_html_e( 'Compile to HTML', 'mjml-email-builder' ); ?></button>
 		</div>
@@ -49,6 +44,7 @@ $is_template = $template && MJML_Post_Type::STATUS_TEMPLATE === $template->post_
 				$block_types = array(
 					'navbar'           => 'Navbar',
 					'section_header'   => 'Section Header',
+					'update'           => 'Update',
 					'text'             => 'Text',
 					'image'            => 'Image',
 					'button'           => 'Button',
@@ -59,6 +55,8 @@ $is_template = $template && MJML_Post_Type::STATUS_TEMPLATE === $template->post_
 					'service_list_two' => 'Two-Col Services',
 					'notice_list'      => 'Notice List',
 					'yahrzeit_list'    => 'Yahrzeit List',
+					'vibes'            => 'Feature',
+					'two_images'       => 'Two-Col Images',
 					'raw'              => 'Raw MJML',
 				);
 				foreach ( $block_types as $type => $label ) : ?>

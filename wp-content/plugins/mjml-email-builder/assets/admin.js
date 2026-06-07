@@ -322,6 +322,35 @@ jQuery( function ( $ ) {
 	// ── TinyMCE helpers ──────────────────────────────────────────────────────
 	var expandedTextBlocks = {}; // { blockId: true } — tracks which text blocks have open editors
 
+	// Strip pasted HTML down to basic formatting only (bold, italic, lists, links).
+	// Used by the paste plugin's paste_preprocess hook on every WYSIWYG.
+	function cleanPastedHtml( html ) {
+		var allowed = { B:1, STRONG:1, I:1, EM:1, U:1, UL:1, OL:1, LI:1, P:1, BR:1, A:1 };
+		var temp = document.createElement( 'div' );
+		temp.innerHTML = html;
+		( function clean( node ) {
+			var kids = Array.prototype.slice.call( node.childNodes );
+			kids.forEach( function( child ) {
+				if ( child.nodeType === 1 ) {
+					clean( child );
+					if ( ! allowed[ child.nodeName ] ) {
+						while ( child.firstChild ) node.insertBefore( child.firstChild, child );
+						node.removeChild( child );
+					} else {
+						var attrs = Array.prototype.slice.call( child.attributes );
+						attrs.forEach( function( a ) {
+							if ( child.nodeName === 'A' && a.name === 'href' ) return;
+							child.removeAttribute( a.name );
+						} );
+					}
+				} else if ( child.nodeType === 8 ) {
+					node.removeChild( child );
+				}
+			} );
+		} )( temp );
+		return temp.innerHTML;
+	}
+
 	function initTextEditor( blockId ) {
 		var editorId = 'mjml-text-' + blockId;
 		if ( ! document.getElementById( editorId ) ) return;
@@ -333,7 +362,8 @@ jQuery( function ( $ ) {
 		wp.editor.initialize( editorId, {
 			tinymce: {
 				toolbar1:           'bold italic underline | styleselect | alignleft aligncenter alignright | link | bullist numlist | removeformat',
-				plugins:            'lists,link',
+				plugins:            'lists,link,paste',
+				paste_preprocess:   function( plugin, args ) { args.content = cleanPastedHtml( args.content ); },
 				menubar:            false,
 				statusbar:          false,
 				height:             250,
@@ -395,7 +425,8 @@ jQuery( function ( $ ) {
 		wp.editor.initialize( editorId, {
 			tinymce: {
 				toolbar1:           'bold italic underline | styleselect | link | bullist numlist | removeformat',
-				plugins:            'lists,link',
+				plugins:            'lists,link,paste',
+				paste_preprocess:   function( plugin, args ) { args.content = cleanPastedHtml( args.content ); },
 				menubar:            false,
 				statusbar:          false,
 				height:             140,
@@ -446,6 +477,8 @@ jQuery( function ( $ ) {
 		if ( block.type === 'service_list' )     return [ 'intro', 'footnote' ];
 		if ( block.type === 'service_list_two' ) return [ 'intro' ];
 		if ( block.type === 'notice_list' )      return [ 'content' ];
+		if ( block.type === 'update' )           return [ 'content' ];
+		if ( block.type === 'vibes' )            return [ 'description' ];
 		return [];
 	}
 
@@ -577,6 +610,7 @@ jQuery( function ( $ ) {
 		navbar:         function() { return { type: 'navbar', id: makeId(), label: 'Also in this email:', padding_top: '10px', padding_bottom: '10px' }; },
 		section_header: function() { return { type: 'section_header', id: makeId(), title: 'Section Title', anchor_id: 'section-title', include_in_nav: true, padding_top: '20px', padding_bottom: '20px' }; },
 		text:           function() { return { type: 'text', id: makeId(), content: '<p>Your content here.</p>', css_class: '' }; },
+		update:         function() { return { type: 'update', id: makeId(), content: '<p><strong>UPDATE:</strong> </p>', highlight_class: 'error_header' }; },
 		image:          function() { return { type: 'image', id: makeId(), src: '', href: '' }; },
 		button:         function() { return { type: 'button', id: makeId(), text: 'Click Here', href: '#', background_color: '#0047B2' }; },
 		divider:        function() { return { type: 'divider', id: makeId(), border_color: '#12142F' }; },
@@ -626,13 +660,33 @@ jQuery( function ( $ ) {
 			type: 'yahrzeit_list', id: makeId(),
 			items_text: 'Person Name, Father Joe Bloggs\nPerson Name, Mother Jane Bloggs',
 		}; },
+
+		two_images: function() { return {
+			type: 'two_images', id: makeId(),
+			left_src: '',  left_href: '',
+			right_src: '', right_href: '',
+		}; },
+
+		vibes: function() { return {
+			type: 'vibes', id: makeId(),
+			title: '',
+			description: '<p>Short description of the group, with date/time of the next meeting.</p>',
+			image2_src: '',
+			image_src: '',
+			image_href: 'https://tinyurl.com/besvibesgroups',
+			button_text: '',
+			button_href: 'https://tinyurl.com/besvibesgroups',
+			image_on_right: true,
+			show_divider: true,
+		}; },
 	};
 
 	var LABELS = {
-		navbar: 'Navbar', section_header: 'Section Header', text: 'Text',
+		navbar: 'Navbar', section_header: 'Section Header', update: 'Update', text: 'Text',
 		image: 'Image', button: 'Button', divider: 'Divider', spacer: 'Spacer', raw: 'Raw MJML',
 		shabbat_times: 'Shabbat Times', service_list: 'Service List',
 		service_list_two: 'Services × 2', notice_list: 'Notice List', yahrzeit_list: 'Yahrzeits',
+		vibes: 'Feature', two_images: 'Two-Col Images',
 	};
 
 	function slugify( str ) {
@@ -644,11 +698,20 @@ jQuery( function ( $ ) {
 		var label   = LABELS[ block.type ] || block.type;
 		var summary = blockSummary( block );
 
-		var $row = $( '<div class="mjml-block-row" data-id="' + block.id + '"></div>' );
+		var rowCls = ( block.locked ? ' is-locked' : '' ) + ( block.hidden ? ' is-hidden' : '' );
+		var $row = $( '<div class="mjml-block-row' + rowCls + '" data-id="' + block.id + '"></div>' );
 
 		var clearBtn = blockHasClearableContent( block.type )
 			? '<button class="mjml-clear-block-content button-link" title="Clear this block\'s content (keep structure)"><span class="dashicons dashicons-editor-removeformatting"></span></button>'
 			: '';
+
+		var hideBtn = block.hidden
+			? '<button class="mjml-hide-block button-link is-hidden" title="Show block (currently hidden from compile)"><span class="dashicons dashicons-hidden"></span></button>'
+			: '<button class="mjml-hide-block button-link" title="Hide block (exclude from compiled output)"><span class="dashicons dashicons-visibility"></span></button>';
+
+		var lockBtn = block.locked
+			? '<button class="mjml-lock-block button-link is-locked" title="Unlock block (click to allow deletion)"><span class="dashicons dashicons-lock"></span></button>'
+			: '<button class="mjml-lock-block button-link" title="Lock block to prevent accidental deletion"><span class="dashicons dashicons-unlock"></span></button>';
 
 		var $header = $(
 			'<div class="mjml-block-header">' +
@@ -657,6 +720,8 @@ jQuery( function ( $ ) {
 				'<span class="mjml-block-summary"></span>' +
 				'<button class="mjml-block-toggle button-link" aria-label="Toggle"><span class="dashicons dashicons-arrow-down-alt2"></span></button>' +
 				clearBtn +
+				hideBtn +
+				lockBtn +
 				'<button class="mjml-delete-block button-link" title="Delete block"><span class="dashicons dashicons-trash"></span></button>' +
 			'</div>'
 		);
@@ -735,8 +800,24 @@ jQuery( function ( $ ) {
 			case 'notice_list':
 				block.content = '<ul><li></li></ul>';
 				return;
+			case 'update':
+				block.content = '<p></p>';
+				return;
 			case 'yahrzeit_list':
 				block.items_text = '';
+				return;
+			case 'two_images':
+				block.left_src = '';  block.left_href = '';
+				block.right_src = ''; block.right_href = '';
+				return;
+			case 'vibes':
+				block.title = '';
+				block.description = '<p></p>';
+				block.image2_src = '';
+				block.image_src = '';
+				block.image_href = '';
+				block.button_text = '';
+				block.button_href = '';
 				return;
 		}
 	}
@@ -746,6 +827,7 @@ jQuery( function ( $ ) {
 			case 'navbar':           return '(auto-generated from section headers)';
 			case 'section_header':   return block.title;
 			case 'text':             return $( '<div>' ).html( block.content ).text().substring( 0, 80 ) + '…';
+			case 'update':           return $( '<div>' ).html( block.content ).text().substring( 0, 80 ) + '…';
 			case 'image':            return block.src || '(no image set)';
 			case 'button':           return block.text;
 			case 'divider':          return 'border: ' + block.border_color;
@@ -755,7 +837,9 @@ jQuery( function ( $ ) {
 			case 'service_list':     return block.title + ' (' + ( block.items || [] ).length + ' items)';
 			case 'service_list_two': return ( block.title ? block.title + ' — ' : '' ) + ( block.left.title || '?' ) + ' / ' + ( block.right.title || '?' );
 			case 'notice_list':      return block.title + ' — ' + $( '<div>' ).html( block.content || '' ).text().substring( 0, 60 ) + '…';
-			case 'yahrzeit_list':    return ( block.items_text || '' ).split( /\n/ ).filter( function(l) { return l.trim(); } ).length + ' yahrzeits';
+			case 'yahrzeit_list':    return ( block.items_text || '' ).split( /\n/ ).filter( function(l) { var t = l.trim(); return t.length && ! /^--+$/.test( t ); } ).length + ' yahrzeits';
+			case 'vibes':            return ( block.title || '(untitled)' ) + ' · image ' + ( block.image_on_right ? 'right' : 'left' );
+			case 'two_images':       return ( block.left_src ? '✓' : '—' ) + ' / ' + ( block.right_src ? '✓' : '—' );
 		}
 		return '';
 	}
@@ -786,6 +870,29 @@ jQuery( function ( $ ) {
 		$row.append( $( '<textarea class="mjml-inline-wysiwyg"></textarea>' )
 			.attr( 'id', inlineEditorId( blockId, fieldKey ) )
 			.val( value || '' ) );
+		return $row;
+	}
+
+	// A picker that lets the user drop a link to any Section Header block into the
+	// update box. Listing every section header (not just the navbar ones) — section
+	// headers always emit their <a name> anchor, so any of them is a valid target.
+	function buildSectionLinkInserter( block ) {
+		var $row = $( '<div class="mjml-field-row mjml-section-link-row"></div>' );
+		var sections = blocks.filter( function( b ) { return b.type === 'section_header'; } );
+		if ( ! sections.length ) {
+			$row.append( '<p class="mjml-field-note">Add a Section Header block to link to it from here.</p>' );
+			return $row;
+		}
+		$row.append( '<span class="mjml-field-label">Insert link to section</span>' );
+		var $sel = $( '<select class="mjml-section-link-select"></select>' );
+		sections.forEach( function( s ) {
+			var title  = ( s.title || '' ).trim() || '(untitled section)';
+			var anchor = s.anchor_id || slugify( title );
+			$sel.append( $( '<option>' ).val( anchor ).text( title ) );
+		} );
+		$row.append( $sel ).append( ' ' )
+			.append( '<button type="button" class="button mjml-insert-section-link">Insert link</button>' );
+		$row.append( '<p class="mjml-field-note">Select the words you want linked in the box above, then choose a section and click Insert. Links show in the normal colour here; when the email is compiled they\'re recoloured to match the highlight style\'s text colour (from Settings) so they stand out on the background.</p>' );
 		return $row;
 	}
 
@@ -825,6 +932,12 @@ jQuery( function ( $ ) {
 					.attr( 'id', 'mjml-text-' + block.id )
 					.val( block.content || '' ) );
 				$f.append( field( 'Section CSS class (optional)', textInput( 'css_class', block.css_class, 'e.g. welcome' ) ) );
+				break;
+
+			case 'update':
+				$f.append( inlineWysiwygField( 'Update text', block.id, 'content', block.content ) );
+				$f.append( buildSectionLinkInserter( block ) );
+				$f.append( field( 'Highlight style (theme class)', textInput( 'highlight_class', block.highlight_class, 'e.g. error_header' ) ) );
 				break;
 
 			case 'image':
@@ -884,7 +997,67 @@ jQuery( function ( $ ) {
 				break;
 
 			case 'yahrzeit_list':
-				$f.append( field( 'Names (one per line — auto-split into two columns)', areaInput( 'items_text', block.items_text, 12 ) ) );
+				$f.append( field( 'Names (one per line — auto-split into two columns; use a line of "--" to force the split point)', areaInput( 'items_text', block.items_text, 12 ) ) );
+				break;
+
+			case 'two_images':
+				[ 'left', 'right' ].forEach( function( side ) {
+					var label = side === 'left' ? 'Left' : 'Right';
+					var srcKey  = side + '_src';
+					var hrefKey = side + '_href';
+
+					var $imgWrap  = $( '<p class="mjml-field-row"></p>' );
+					var $imgLabel = $( '<label></label>' ).append( '<span class="mjml-field-label">' + label + ' image URL</span>' );
+					var $imgInput = $( '<input type="text" class="regular-text mjml-field">' )
+						.attr( { 'data-key': srcKey } ).val( block[ srcKey ] || '' );
+					var $imgPick  = $( '<button class="button mjml-media-pick" type="button">Choose Image</button>' );
+					$imgLabel.append( $imgInput ).append( ' ' ).append( $imgPick );
+					$imgWrap.append( $imgLabel );
+					$f.append( $imgWrap );
+
+					$f.append( field( label + ' link URL (optional)', textInput( hrefKey, block[ hrefKey ] ) ) );
+				} );
+				break;
+
+			case 'vibes':
+				$f.append( field( 'Name', textInput( 'title', block.title, 'e.g. Book Club' ) ) );
+
+				var $img2Wrap  = $( '<p class="mjml-field-row"></p>' );
+				var $img2Label = $( '<label></label>' ).append( '<span class="mjml-field-label">Top image URL (optional, no link)</span>' );
+				var $img2Input = $( '<input type="text" class="regular-text mjml-field">' )
+					.attr( { 'data-key': 'image2_src' } ).val( block.image2_src || '' );
+				var $img2Pick  = $( '<button class="button mjml-media-pick" type="button">Choose Image</button>' );
+				$img2Label.append( $img2Input ).append( ' ' ).append( $img2Pick );
+				$img2Wrap.append( $img2Label );
+				$f.append( $img2Wrap );
+
+				var $imgWrap  = $( '<p class="mjml-field-row"></p>' );
+				var $imgLabel = $( '<label></label>' ).append( '<span class="mjml-field-label">Image URL</span>' );
+				var $imgInput = $( '<input type="text" class="regular-text mjml-field">' )
+					.attr( { 'data-key': 'image_src' } ).val( block.image_src || '' );
+				var $imgPick  = $( '<button class="button mjml-media-pick" type="button">Choose Image</button>' );
+				$imgLabel.append( $imgInput ).append( ' ' ).append( $imgPick );
+				$imgWrap.append( $imgLabel );
+				$f.append( $imgWrap );
+
+				$f.append( field( 'Image link URL (optional)', textInput( 'image_href', block.image_href ) ) );
+				$f.append( inlineWysiwygField( 'Description', block.id, 'description', block.description ) );
+				$f.append( field( 'Button text', textInput( 'button_text', block.button_text ) ) );
+				$f.append( field( 'Button link URL', textInput( 'button_href', block.button_href ) ) );
+				$f.append( $( '<p class="mjml-field-row"></p>' ).append(
+					$( '<label class="mjml-checkbox-label"></label>' ).append(
+						$( '<input type="checkbox" class="mjml-field">' )
+							.attr( 'data-key', 'image_on_right' )
+							.prop( 'checked', block.image_on_right !== false )
+					).append( ' Image on the right (uncheck to flip to the left)' )
+				) );
+				$f.append( $( '<p class="mjml-field-row"></p>' ).append(
+					$( '<label class="mjml-checkbox-label"></label>' ).append(
+						$( '<input type="checkbox" class="mjml-field">' )
+							.attr( 'data-key', 'show_divider' )
+							.prop( 'checked', block.show_divider !== false )
+					).append( ' Show divider below this block' )
+				) );
 				break;
 		}
 
@@ -933,17 +1106,26 @@ jQuery( function ( $ ) {
 		$wrap.append( '<p class="mjml-field-label">Service items</p>' );
 		var $list = $( '<div class="mjml-repeat-list"></div>' );
 		( block[ key ] || [] ).forEach( function(item, i) {
-			var $row = $( '<div class="mjml-repeat-row"></div>' ).attr( 'data-index', i );
+			var $row = $( '<div class="mjml-repeat-row"></div>' )
+				.attr( 'data-index', i )
+				.toggleClass( 'is-hidden', !! item.hidden );
 			$row.append( $( '<input type="text" class="mjml-svc-label" placeholder="Label (bold)">' ).val( item.label || '' ) );
 			$row.append( colorSelect( item.color ) );
 			$row.append( $( '<input type="text" class="mjml-svc-time" placeholder="Time">' ).val( item.time || '' ) );
 			$row.append( $( '<input type="text" class="mjml-svc-notes" placeholder="Notes (after time)">' ).val( item.notes || '' ) );
+			$row.append( svcHideButton( item ) );
 			$row.append( $( '<button type="button" class="button-link mjml-svc-del" title="Remove">×</button>' ) );
 			$list.append( $row );
 		} );
 		$wrap.append( $list );
 		$wrap.append( '<button type="button" class="button mjml-svc-add">+ Add service</button>' );
 		return $wrap;
+	}
+
+	function svcHideButton( item ) {
+		return item.hidden
+			? '<button type="button" class="button-link mjml-svc-hide is-hidden" title="Show item (currently hidden from compile)"><span class="dashicons dashicons-hidden"></span></button>'
+			: '<button type="button" class="button-link mjml-svc-hide" title="Hide item (exclude from compiled output)"><span class="dashicons dashicons-visibility"></span></button>';
 	}
 
 	function buildTwoColServicesEditor( block ) {
@@ -962,12 +1144,14 @@ jQuery( function ( $ ) {
 				// can still locate the original item in block[side].items.
 				var $row = $( '<div class="mjml-repeat-row"></div>' )
 					.attr( 'data-index', i )
-					.attr( 'data-orig-side', side );
+					.attr( 'data-orig-side', side )
+					.toggleClass( 'is-hidden', !! item.hidden );
 				$row.append( '<span class="mjml-svc-drag dashicons dashicons-move" title="Drag to reorder or move between columns"></span>' );
 				$row.append( $( '<input type="text" class="mjml-svc-label" placeholder="Label (bold)">' ).val( item.label || '' ) );
 				$row.append( colorSelect( item.color ) );
 				$row.append( $( '<input type="text" class="mjml-svc-time" placeholder="Time">' ).val( item.time || '' ) );
 				$row.append( $( '<input type="text" class="mjml-svc-notes" placeholder="Notes">' ).val( item.notes || '' ) );
+				$row.append( svcHideButton( item ) );
 				$row.append( $( '<button type="button" class="button-link mjml-svc-dup" title="Duplicate"><span class="dashicons dashicons-admin-page"></span></button>' ) );
 				$row.append( $( '<button type="button" class="button-link mjml-svc-del" title="Remove">×</button>' ) );
 				$list.append( $row );
@@ -1031,7 +1215,7 @@ jQuery( function ( $ ) {
 	}
 
 	function updateNavbarPreview( $container ) {
-		var navHeaders = blocks.filter( function(b) { return b.type === 'section_header' && b.include_in_nav; } );
+		var navHeaders = blocks.filter( function(b) { return b.type === 'section_header' && b.include_in_nav && ! b.hidden; } );
 		var $preview   = $container.find( '.mjml-navbar-preview' );
 		if ( ! $preview.length ) return;
 		if ( ! navHeaders.length ) {
@@ -1193,14 +1377,117 @@ jQuery( function ( $ ) {
 			markDirty();
 		} )
 
+		// Auto-fill the Vibes button text from the Name when Name loses focus.
+		// Only overwrites if the button text is empty or still matches the auto pattern,
+		// so a manually customised button text is preserved.
+		.on( 'blur', '.mjml-field', function() {
+			var $row  = $( this ).closest( '.mjml-block-row' );
+			var id    = $row.data( 'id' );
+			var block = blocks.find( function(b) { return b.id === id; } );
+			if ( ! block || block.type !== 'vibes' ) return;
+			if ( $( this ).data( 'key' ) !== 'title' ) return;
+
+			var name = ( block.title || '' ).trim();
+			if ( ! name ) return;
+
+			var current = block.button_text || '';
+			if ( current && ! /^Sign up to the /.test( current ) ) return;
+
+			var desired = 'Sign up to the ' + name;
+			if ( current === desired ) return;
+
+			block.button_text = desired;
+			$row.find( 'input.mjml-field[data-key="button_text"]' ).val( desired );
+			$row.find( '.mjml-block-summary' ).text( blockSummary( block ) );
+			markDirty();
+		} )
+
+		// Update block: insert a link to the chosen section into the WYSIWYG.
+		.on( 'click', '.mjml-insert-section-link', function() {
+			var $row  = $( this ).closest( '.mjml-block-row' );
+			var id    = $row.data( 'id' );
+			var block = blocks.find( function( b ) { return b.id === id; } );
+			if ( ! block ) return;
+
+			var anchor = $row.find( '.mjml-section-link-select' ).val();
+			if ( ! anchor ) return;
+
+			var editorId = inlineEditorId( id, 'content' );
+			var ed = typeof tinymce !== 'undefined' ? tinymce.get( editorId ) : null;
+			if ( ! ed || ed.isHidden() ) {
+				alert( 'Click inside the update text box first, then insert the link.' );
+				return;
+			}
+
+			// Use the current selection as the link text; fall back to the section title.
+			var selected = ed.selection.getContent();
+			var inner = selected || $( '<span>' ).text( $row.find( '.mjml-section-link-select option:selected' ).text() ).html();
+
+			// Insert a plain link — the white colour for the highlight background is
+			// applied at compile time (see renderUpdate), so the link stays visible in
+			// the normal link colour while editing.
+			ed.execCommand( 'mceInsertContent', false,
+				'<a href="#' + escAttr( anchor ) + '">' + inner + '</a>' );
+
+			block.content = ed.getContent();
+			markDirty();
+		} )
+
 		.on( 'click', '.mjml-delete-block', function( e ) {
 			e.stopPropagation();
 			var id    = $( this ).closest( '.mjml-block-row' ).data( 'id' );
 			var block = blocks.find( function(b) { return b.id === id; } );
+			if ( block && block.locked ) return; // belt-and-suspenders: button is hidden via CSS, but ignore stray clicks too
 			if ( block && block.type === 'text' )       removeTextEditor( id );
 			if ( block && blockHasInlineEditors( block ) ) removeInlineWysiwygsForBlock( id );
 			blocks = blocks.filter( function(b) { return b.id !== id; } );
 			renderAll();
+			markDirty();
+		} )
+
+		.on( 'click', '.mjml-hide-block', function( e ) {
+			e.stopPropagation();
+			var $row  = $( this ).closest( '.mjml-block-row' );
+			var id    = $row.data( 'id' );
+			var block = blocks.find( function(b) { return b.id === id; } );
+			if ( ! block ) return;
+			block.hidden = ! block.hidden;
+			$row.toggleClass( 'is-hidden', !! block.hidden );
+			var $btn  = $( this );
+			var $icon = $btn.find( '.dashicons' );
+			if ( block.hidden ) {
+				$btn.addClass( 'is-hidden' ).attr( 'title', 'Show block (currently hidden from compile)' );
+				$icon.removeClass( 'dashicons-visibility' ).addClass( 'dashicons-hidden' );
+			} else {
+				$btn.removeClass( 'is-hidden' ).attr( 'title', 'Hide block (exclude from compiled output)' );
+				$icon.removeClass( 'dashicons-hidden' ).addClass( 'dashicons-visibility' );
+			}
+			// Hiding a section_header affects the navbar — refresh any open navbar previews.
+			if ( block.type === 'section_header' ) {
+				$( '.mjml-navbar-preview' ).each( function() {
+					updateNavbarPreview( $( this ).closest( '.mjml-block-fields' ) );
+				} );
+			}
+			markDirty();
+		} )
+
+		.on( 'click', '.mjml-lock-block', function( e ) {
+			e.stopPropagation();
+			var $row  = $( this ).closest( '.mjml-block-row' );
+			var id    = $row.data( 'id' );
+			var block = blocks.find( function(b) { return b.id === id; } );
+			if ( ! block ) return;
+			block.locked = ! block.locked;
+			$row.toggleClass( 'is-locked', !! block.locked );
+			var $btn  = $( this );
+			var $icon = $btn.find( '.dashicons' );
+			if ( block.locked ) {
+				$btn.addClass( 'is-locked' ).attr( 'title', 'Unlock block (click to allow deletion)' );
+				$icon.removeClass( 'dashicons-unlock' ).addClass( 'dashicons-lock' );
+			} else {
+				$btn.removeClass( 'is-locked' ).attr( 'title', 'Lock block to prevent accidental deletion' );
+				$icon.removeClass( 'dashicons-lock' ).addClass( 'dashicons-unlock' );
+			}
 			markDirty();
 		} )
 
@@ -1209,6 +1496,7 @@ jQuery( function ( $ ) {
 			var id    = $( this ).closest( '.mjml-block-row' ).data( 'id' );
 			var block = blocks.find( function(b) { return b.id === id; } );
 			if ( ! block ) return;
+			if ( block.locked ) return; // hidden via CSS, but guard against stray events too
 			// Tear down editors before mutating so they don't write stale content back.
 			if ( block.type === 'text' )                 removeTextEditor( id );
 			if ( blockHasInlineEditors( block ) )        removeInlineWysiwygsForBlock( id );
@@ -1242,11 +1530,39 @@ jQuery( function ( $ ) {
 
 		.on( 'click', '.mjml-media-pick', function( e ) {
 			e.preventDefault();
-			var $input = $( this ).siblings( 'input[data-key="src"]' );
-			var frame  = wp.media( { title: 'Choose Image', button: { text: 'Use this image' }, multiple: false } );
+			var $input = $( this ).siblings( 'input.mjml-field' ).first();
+			// Use a Library controller with displaySettings:true so the sidebar
+			// shows WordPress's native Size dropdown (thumbnail/medium/large/full).
+			var frame = wp.media( {
+				title: 'Choose Image',
+				button: { text: 'Use this image' },
+				multiple: false,
+				library: { type: 'image' },
+				states: [ new wp.media.controller.Library( {
+					title:               'Choose Image',
+					library:             wp.media.query( { type: 'image' } ),
+					multiple:            false,
+					displaySettings:     true,
+					displayUserSettings: false,
+				} ) ],
+			} );
+			// Default the sidebar Size dropdown to "Full" instead of WordPress's
+			// global default (typically Medium). Fires on initial add only, so a
+			// user's later change to the dropdown isn't overridden.
+			frame.on( 'open', function() {
+				var state = frame.state();
+				state.get( 'selection' ).on( 'add', function( attachment ) {
+					state.display( attachment ).set( 'size', 'full' );
+				} );
+			} );
 			frame.on( 'select', function() {
-				var att = frame.state().get( 'selection' ).first().toJSON();
-				$input.val( att.url ).trigger( 'change' );
+				var selection = frame.state().get( 'selection' ).first();
+				var att       = selection.toJSON();
+				var display   = frame.state().display( selection ).toJSON();
+				var size      = display && display.size ? display.size : 'full';
+				var sized     = att.sizes && att.sizes[ size ];
+				var url       = sized && sized.url ? sized.url : att.url;
+				$input.val( url ).trigger( 'change' );
 			} );
 			frame.open();
 		} )
@@ -1345,6 +1661,32 @@ jQuery( function ( $ ) {
 			markDirty();
 		} )
 
+		.on( 'click', '.mjml-svc-hide', function( e ) {
+			e.preventDefault();
+			var $row   = $( this ).closest( '.mjml-block-row' );
+			var block  = blocks.find( function(b) { return b.id === $row.data( 'id' ); } );
+			if ( ! block ) return;
+			var $entry = $( this ).closest( '.mjml-repeat-row' );
+			var index  = parseInt( $entry.attr( 'data-index' ), 10 );
+			var side   = $entry.closest( '.mjml-twocol-side' ).data( 'side' );
+			var key    = $entry.closest( '.mjml-repeat' ).data( 'key' );
+			var arr    = side && block[ side ] ? block[ side ].items : block[ key ];
+			if ( ! arr || ! arr[ index ] ) return;
+			var item = arr[ index ];
+			item.hidden = ! item.hidden;
+			$entry.toggleClass( 'is-hidden', !! item.hidden );
+			var $btn  = $( this );
+			var $icon = $btn.find( '.dashicons' );
+			if ( item.hidden ) {
+				$btn.addClass( 'is-hidden' ).attr( 'title', 'Show item (currently hidden from compile)' );
+				$icon.removeClass( 'dashicons-visibility' ).addClass( 'dashicons-hidden' );
+			} else {
+				$btn.removeClass( 'is-hidden' ).attr( 'title', 'Hide item (exclude from compiled output)' );
+				$icon.removeClass( 'dashicons-hidden' ).addClass( 'dashicons-visibility' );
+			}
+			markDirty();
+		} )
+
 		.on( 'click', '.mjml-svc-dup', function( e ) {
 			e.preventDefault();
 			var $row   = $( this ).closest( '.mjml-block-row' );
@@ -1411,8 +1753,10 @@ jQuery( function ( $ ) {
 		markDirty();
 	} );
 
-	// Holds the last compiled HTML for copying
-	var lastCompiledHtml = '';
+	// Holds the last compiled HTML for copying. Seeded from the server-side
+	// cached HTML so Copy HTML works immediately on page load, before the user
+	// has clicked Compile.
+	var lastCompiledHtml = mjmlEb.compiledHtml || '';
 
 	// ── Compile ──────────────────────────────────────────────────────────────
 	function doCompile( silent ) {
@@ -1424,7 +1768,7 @@ jQuery( function ( $ ) {
 		if ( ! silent ) setStatus( mjmlEb.i18n.converting, 'saving' );
 		$( '#mjml-convert-btn' ).prop( 'disabled', true );
 
-		var bodySections = blocks.map( renderBlockToMjml ).join( '\n' );
+		var bodySections = blocks.filter( function(b) { return ! b.hidden; } ).map( renderBlockToMjml ).join( '\n' );
 		var mjmlDoc =
 			'<mjml>\n  <mj-head>\n' + ( activeTheme.styles || '' ) + '\n  </mj-head>\n' +
 			'  <mj-body>\n' +
@@ -1435,7 +1779,15 @@ jQuery( function ( $ ) {
 
 		var result;
 		try {
-			result = window.mjml( mjmlDoc, { validationLevel: 'soft' } );
+			result = window.mjml( mjmlDoc, {
+				validationLevel: 'soft',
+				minify:          true,
+				minifyOptions:   {
+					collapseWhitespace:     true,
+					removeEmptyAttributes:  true,
+					minifyCSS:              false, // keep CSS readable so email-client quirks don't bite
+				},
+			} );
 		} catch ( err ) {
 			setStatus( mjmlEb.i18n.error + err.message, 'error' );
 			$( '#mjml-convert-btn' ).prop( 'disabled', false );
@@ -1459,7 +1811,11 @@ jQuery( function ( $ ) {
 		if ( ! silent ) setStatus( mjmlEb.i18n.saved, 'saved' );
 		lastCompiledHtml = result.html;
 
-		document.getElementById( 'mjml-preview-frame' ).srcdoc = result.html;
+		// Strip <script> tags before previewing: real email clients block JS, and
+		// our preview iframe is sandboxed without allow-scripts so any <script> in
+		// the output produces a "Blocked script execution in about:srcdoc" warning.
+		var previewHtml = result.html.replace( /<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, '' );
+		document.getElementById( 'mjml-preview-frame' ).srcdoc = previewHtml;
 		$( '#mjml-output-panel' ).show();
 		$( '#mjml-convert-btn' ).prop( 'disabled', false );
 
@@ -1543,7 +1899,7 @@ jQuery( function ( $ ) {
 
 	// ── Copy MJML ────────────────────────────────────────────────────────────
 	$( '#mjml-copy-mjml-btn' ).on( 'click', function() {
-		var bodySections = blocks.map( renderBlockToMjml ).join( '\n' );
+		var bodySections = blocks.filter( function(b) { return ! b.hidden; } ).map( renderBlockToMjml ).join( '\n' );
 		var mjmlDoc =
 			'<mjml>\n  <mj-head>\n' + ( activeTheme.styles || '' ) + '\n  </mj-head>\n' +
 			'  <mj-body>\n' +
@@ -1643,7 +1999,9 @@ jQuery( function ( $ ) {
 			case 'section_header':
 				var topSpacer    = ( parseInt( block.padding_top, 10 )    > 0 ) ? '<mj-section padding="0"><mj-column><mj-spacer height="' + esc(block.padding_top)    + '"></mj-spacer></mj-column></mj-section>' : '';
 				var bottomSpacer = ( parseInt( block.padding_bottom, 10 ) > 0 ) ? '<mj-section padding="0"><mj-column><mj-spacer height="' + esc(block.padding_bottom) + '"></mj-spacer></mj-column></mj-section>' : '';
-				var anchor       = block.include_in_nav ? '<!-- htmlmin:ignore --><a name="' + esc(block.anchor_id) + '"></a><!-- htmlmin:ignore -->' : '';
+				// Always emit the anchor (not just for nav sections) so any section
+				// header can be a link target — e.g. from an Update block.
+				var anchor       = block.anchor_id ? '<!-- htmlmin:ignore --><a name="' + esc(block.anchor_id) + '"></a><!-- htmlmin:ignore -->' : '';
 				return topSpacer +
 					'<mj-section padding="0"><mj-column>' +
 					'<mj-text mj-class="section_header">' +
@@ -1678,7 +2036,10 @@ jQuery( function ( $ ) {
 			case 'service_list':     return renderServiceList( block );
 			case 'service_list_two': return renderServiceListTwo( block );
 			case 'notice_list':      return renderNoticeList( block );
+			case 'update':           return renderUpdate( block );
 			case 'yahrzeit_list':    return renderYahrzeitList( block );
+			case 'vibes':            return renderVibes( block );
+			case 'two_images':       return renderTwoImages( block );
 			default:
 				return '';
 		}
@@ -1712,7 +2073,7 @@ jQuery( function ( $ ) {
 	}
 
 	function renderServiceList( block ) {
-		var lis   = ( block.items || [] ).map( renderServiceItem ).join( '' );
+		var lis   = ( block.items || [] ).filter( function(i) { return ! i.hidden; } ).map( renderServiceItem ).join( '' );
 		var intro = block.intro ? '<p>' + block.intro + '</p>' : '';
 		// TinyMCE wraps content in its own <p>; without stripping it we'd emit
 		// <p class="small"><p>...</p></p>, which compiles to extra blank lines.
@@ -1732,7 +2093,7 @@ jQuery( function ( $ ) {
 		var titleHtml = col.title
 			? '<h3' + ( col.title_color ? ' class="' + esc( col.title_color ) + '"' : '' ) + '>' + esc( col.title ) + '</h3>'
 			: '';
-		var lis = ( col.items || [] ).map( renderServiceItem ).join( '' );
+		var lis = ( col.items || [] ).filter( function(i) { return ! i.hidden; } ).map( renderServiceItem ).join( '' );
 		return '<mj-column><mj-text>' + titleHtml + '<ul>' + lis + '</ul></mj-text></mj-column>';
 	}
 
@@ -1747,6 +2108,53 @@ jQuery( function ( $ ) {
 		return head + '<mj-section padding-top="0">' + renderServiceColumn( block.left ) + renderServiceColumn( block.right ) + '</mj-section>';
 	}
 
+	// Read the `color` attribute of an <mj-class name="..."> defined in the theme's
+	// mj-attributes (e.g. error_header → "#FFF"). Returns '' if not found. Lets the
+	// Update block match its link colour to whatever the chosen highlight style uses,
+	// so different styles (red, blue, …) are all supported.
+	function mjClassColor( stylesMjml, className ) {
+		if ( ! stylesMjml || ! className ) return '';
+		var re = /<mj-class\b([^>]*?)\/?>/gi;
+		var m;
+		while ( ( m = re.exec( stylesMjml ) ) !== null ) {
+			var attrs = ' ' + m[1];
+			var nameM = /\sname\s*=\s*["']([^"']*)["']/i.exec( attrs );
+			if ( ! nameM || nameM[1] !== className ) continue;
+			// Anchor on whitespace so this doesn't also match `container-background-color`.
+			var colorM = /\scolor\s*=\s*["']([^"']*)["']/i.exec( attrs );
+			return colorM ? colorM[1] : '';
+		}
+		return '';
+	}
+
+	// Force a colour onto any link that doesn't already declare one. Used by the
+	// Update block so in-email anchors show up against the highlight background
+	// without baking presentational styles into the saved WYSIWYG content.
+	function colorizeLinks( html, color ) {
+		if ( ! html ) return html;
+		var d = document.createElement( 'div' );
+		d.innerHTML = html;
+		Array.prototype.forEach.call( d.querySelectorAll( 'a' ), function( a ) {
+			var existing = a.getAttribute( 'style' ) || '';
+			if ( /color\s*:/i.test( existing ) ) return; // respect a manual colour
+			a.setAttribute( 'style', ( existing ? existing.replace( /;?\s*$/, '; ' ) : '' ) + 'color:' + color );
+		} );
+		return d.innerHTML;
+	}
+
+	function renderUpdate( block ) {
+		var cls = block.highlight_class ? ' mj-class="' + esc( block.highlight_class ) + '"' : '';
+		// Match link colour to the highlight style's text colour from the theme
+		// (e.g. error_header → #FFF). Leave links alone if the style sets no colour.
+		var linkColor = mjClassColor( activeTheme.styles, block.highlight_class );
+		var content   = linkColor ? colorizeLinks( block.content || '', linkColor ) : ( block.content || '' );
+		return '<mj-section><mj-column>' +
+			'<mj-spacer height="10px" />' +
+			'<mj-text' + cls + ' align="left">' + content + '</mj-text>' +
+			'<mj-spacer height="20px" />' +
+			'</mj-column></mj-section>';
+	}
+
 	function renderNoticeList( block ) {
 		return '<mj-section padding="0"><mj-column>' +
 			'<mj-text padding-top="0" padding-bottom="0">' +
@@ -1755,14 +2163,69 @@ jQuery( function ( $ ) {
 			'</mj-text></mj-column></mj-section>';
 	}
 
+	function renderVibes( block ) {
+		var imageRight = block.image_on_right !== false;
+		var direction  = imageRight ? '' : ' direction="rtl"';
+		var titleHtml  = block.title ? '<h3>' + esc( block.title ) + '</h3>' : '';
+		var descHtml   = block.description || '';
+		var img2Html   = block.image2_src
+			? '<mj-image src="' + esc( block.image2_src ) + '" />'
+			: '';
+		var imgHtml    = block.image_src
+			? '<mj-image' + ( block.image_href ? ' href="' + esc( block.image_href ) + '"' : '' ) + ' src="' + esc( block.image_src ) + '" />'
+			: '';
+		var btnHtml    = block.button_text
+			? '<mj-button href="' + esc( block.button_href || '#' ) + '">' + esc( block.button_text ) + '</mj-button>'
+			: '';
+		var dividerHtml = block.show_divider !== false
+			? '<mj-section><mj-column>' +
+				'<mj-spacer height="10px" />' +
+				'<mj-divider border-color="#999" />' +
+				'<mj-spacer height="5px" />' +
+				'</mj-column></mj-section>'
+			: '';
+		return '<mj-section' + direction + '>' +
+				'<mj-column>' +
+					'<mj-text>' + titleHtml + descHtml + '</mj-text>' +
+					btnHtml +
+				'</mj-column>' +
+				'<mj-column>' + img2Html + imgHtml + '</mj-column>' +
+			'</mj-section>' +
+			dividerHtml;
+	}
+
+	function renderTwoImages( block ) {
+		function col( src, href ) {
+			if ( ! src ) return '<mj-column></mj-column>';
+			var hrefAttr = href ? ' href="' + esc( href ) + '"' : '';
+			return '<mj-column><mj-image src="' + esc( src ) + '"' + hrefAttr + ' /></mj-column>';
+		}
+		return '<mj-section padding="0">' +
+			col( block.left_src,  block.left_href ) +
+			col( block.right_src, block.right_href ) +
+			'</mj-section>';
+	}
+
 	function renderYahrzeitList( block ) {
 		var lines = ( block.items_text || '' ).split( /\n/ )
 			.map( function(l) { return l.trim(); } )
 			.filter( function(l) { return l.length; } );
 		if ( ! lines.length ) return '';
-		var half  = Math.ceil( lines.length / 2 );
-		var left  = lines.slice( 0, half ).map( esc ).join( '<br /> ' );
-		var right = lines.slice( half ).map( esc ).join( '<br /> ' );
+		var splitIdx = -1;
+		for ( var i = 0; i < lines.length; i++ ) {
+			if ( /^--+$/.test( lines[ i ] ) ) { splitIdx = i; break; }
+		}
+		var leftLines, rightLines;
+		if ( splitIdx >= 0 ) {
+			leftLines  = lines.slice( 0, splitIdx );
+			rightLines = lines.slice( splitIdx + 1 );
+		} else {
+			var half = Math.ceil( lines.length / 2 );
+			leftLines  = lines.slice( 0, half );
+			rightLines = lines.slice( half );
+		}
+		var left  = leftLines.map( esc ).join( '<br /> ' );
+		var right = rightLines.map( esc ).join( '<br /> ' );
 		return '<mj-section><mj-column>' +
 			'<mj-spacer height="10px" />' +
 			'<mj-text mj-class="small"> ' + left + '<br /></mj-text>' +
@@ -1775,7 +2238,7 @@ jQuery( function ( $ ) {
 	}
 
 	function renderNavbar( navBlock ) {
-		var navBlocks = blocks.filter( function(b) { return b.type === 'section_header' && b.include_in_nav; } );
+		var navBlocks = blocks.filter( function(b) { return b.type === 'section_header' && b.include_in_nav && ! b.hidden; } );
 		if ( ! navBlocks.length ) return '';
 		var links = navBlocks.map( function(b) {
 			var label = ( b.nav_label && b.nav_label.length ) ? b.nav_label : b.title;
