@@ -74,6 +74,9 @@ Yes. The preview iframe runs with `sandbox="allow-same-origin"` only — scripts
 
 == Changelog ==
 
+= 2.4.13 =
+* Yahrzeits block: simple inline formatting in the names textarea — wrap text in `*asterisks*` for bold or `_underscores_` for italic (e.g. a `*Tuesday 23 June*` heading at the top of the list). Blank lines now insert an extra line break instead of being silently dropped, so you can group entries visually. Auto-split into two columns now counts non-blank lines so columns stay balanced when blanks are interspersed.
+
 = 2.4.12 =
 * Settings: new "Import full MJML" helper on the theme editor. Paste a complete `<mjml>` document and click "Split into fields" to auto-populate Global Styles (from `<mj-head>`), Header, and Footer. A literal `[BLOCKS]` placeholder inside `<mj-body>` marks where per-email content goes: everything before it becomes the Header, everything after becomes the Footer. When you open an existing theme, the import box is auto-filled with the reconstructed full document (header, `[BLOCKS]`, footer) so you can view/edit it whole and re-split, and the preview is generated automatically. The "Preview" renders the theme in a sandboxed iframe with sample blocks laid out across two sections — welcome, update, navbar, section headers, text, button, two-col images, feature, spacer, image, shabbat times, service lists, notices, yahrzeits and raw — so you can see the theme fully exercised without building an email. Note: `<mj-body>` attributes (e.g. background-color) aren't stored by themes and are dropped with a warning on split.
 

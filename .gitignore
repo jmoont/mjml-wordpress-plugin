@@ -12,7 +12,7 @@
 !/AGENTS.md
 !/CLAUDE.md
 !/STUDIO.md
-!/mjml-email-builder.zip
+!/mjml-email-builder-*.zip
 
 # Claude's transient worktrees and machine-local settings are never tracked,
 # even though .claude/ otherwise is.
