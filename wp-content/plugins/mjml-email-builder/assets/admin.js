@@ -997,7 +997,7 @@ jQuery( function ( $ ) {
 				break;
 
 			case 'yahrzeit_list':
-				$f.append( field( 'Names (one per line — auto-split into two columns; use a line of "--" to force the split point)', areaInput( 'items_text', block.items_text, 12 ) ) );
+				$f.append( field( 'Names (one per line — auto-split into two columns; use a line of "--" to force the split point. Wrap text in *asterisks* for bold or _underscores_ for italic. Blank lines insert an extra line break.)', areaInput( 'items_text', block.items_text, 12 ) ) );
 				break;
 
 			case 'two_images':
@@ -2207,25 +2207,39 @@ jQuery( function ( $ ) {
 	}
 
 	function renderYahrzeitList( block ) {
-		var lines = ( block.items_text || '' ).split( /\n/ )
-			.map( function(l) { return l.trim(); } )
-			.filter( function(l) { return l.length; } );
-		if ( ! lines.length ) return '';
+		var rawLines = ( block.items_text || '' ).split( /\n/ )
+			.map( function(l) { return l.trim(); } );
+		while ( rawLines.length && ! rawLines[ 0 ].length ) rawLines.shift();
+		while ( rawLines.length && ! rawLines[ rawLines.length - 1 ].length ) rawLines.pop();
+		if ( ! rawLines.length ) return '';
+
 		var splitIdx = -1;
-		for ( var i = 0; i < lines.length; i++ ) {
-			if ( /^--+$/.test( lines[ i ] ) ) { splitIdx = i; break; }
+		for ( var i = 0; i < rawLines.length; i++ ) {
+			if ( /^--+$/.test( rawLines[ i ] ) ) { splitIdx = i; break; }
 		}
 		var leftLines, rightLines;
 		if ( splitIdx >= 0 ) {
-			leftLines  = lines.slice( 0, splitIdx );
-			rightLines = lines.slice( splitIdx + 1 );
+			leftLines  = rawLines.slice( 0, splitIdx );
+			rightLines = rawLines.slice( splitIdx + 1 );
 		} else {
-			var half = Math.ceil( lines.length / 2 );
-			leftLines  = lines.slice( 0, half );
-			rightLines = lines.slice( half );
+			// Auto-split: keep column heights balanced by non-blank line count.
+			var nonBlankTotal = 0;
+			for ( var n = 0; n < rawLines.length; n++ ) if ( rawLines[ n ].length ) nonBlankTotal++;
+			var leftTarget = Math.ceil( nonBlankTotal / 2 );
+			var seen = 0, cutAt = rawLines.length;
+			for ( var j = 0; j < rawLines.length; j++ ) {
+				if ( rawLines[ j ].length ) seen++;
+				if ( seen >= leftTarget ) { cutAt = j + 1; break; }
+			}
+			leftLines  = rawLines.slice( 0, cutAt );
+			rightLines = rawLines.slice( cutAt );
 		}
-		var left  = leftLines.map( esc ).join( '<br /> ' );
-		var right = rightLines.map( esc ).join( '<br /> ' );
+		while ( leftLines.length  && ! leftLines [ leftLines.length  - 1 ].length ) leftLines.pop();
+		while ( rightLines.length && ! rightLines[ 0 ].length )                     rightLines.shift();
+		while ( rightLines.length && ! rightLines[ rightLines.length - 1 ].length ) rightLines.pop();
+
+		var left  = leftLines .map( formatYahrzeitLine ).join( '<br /> ' );
+		var right = rightLines.map( formatYahrzeitLine ).join( '<br /> ' );
 		return '<mj-section><mj-column>' +
 			'<mj-spacer height="10px" />' +
 			'<mj-text mj-class="small"> ' + left + '<br /></mj-text>' +
@@ -2235,6 +2249,13 @@ jQuery( function ( $ ) {
 			'<mj-text mj-class="small"> ' + right + '<br /></mj-text>' +
 			'<mj-spacer height="20px" />' +
 			'</mj-column></mj-section>';
+	}
+
+	// *text* → <strong>, _text_ → <em>; escape first so tags survive only where we add them.
+	function formatYahrzeitLine( line ) {
+		return esc( line )
+			.replace( /\*([^*\n]+)\*/g, '<strong>$1</strong>' )
+			.replace( /_([^_\n]+)_/g,   '<em>$1</em>' );
 	}
 
 	function renderNavbar( navBlock ) {
