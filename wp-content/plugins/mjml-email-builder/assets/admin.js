@@ -783,6 +783,7 @@ jQuery( function ( $ ) {
 				block.intro = '';
 				block.footnote = '';
 				( block.items || [] ).forEach( function( item ) {
+					if ( isSubItem( item ) ) return;
 					item.time = '';
 					item.notes = '';
 				} );
@@ -792,6 +793,7 @@ jQuery( function ( $ ) {
 				[ 'left', 'right' ].forEach( function( side ) {
 					if ( ! block[ side ] ) return;
 					( block[ side ].items || [] ).forEach( function( item ) {
+						if ( isSubItem( item ) ) return;
 						item.time = '';
 						item.notes = '';
 					} );
@@ -1101,24 +1103,56 @@ jQuery( function ( $ ) {
 		return $wrap;
 	}
 
+	function isSubItem( item ) {
+		return !! item && item.kind === 'sub';
+	}
+
+	// One row of a service-items list. Sub-heading rows (kind: 'sub') drop the
+	// time/notes inputs — they break the list into sub-sections rather than
+	// being list items themselves.
+	function buildServiceRow( item, i, opts ) {
+		var isSub = isSubItem( item );
+		var $row  = $( '<div class="mjml-repeat-row"></div>' )
+			.attr( 'data-index', i )
+			.toggleClass( 'is-subheading', isSub )
+			.toggleClass( 'is-hidden', !! item.hidden );
+		if ( opts.drag ) {
+			$row.append( '<span class="mjml-svc-drag dashicons dashicons-move" title="Drag to reorder or move between columns"></span>' );
+		}
+		$row.append( $( '<input type="text" class="mjml-svc-label">' )
+			.attr( 'placeholder', isSub ? 'Sub-heading' : 'Label (bold)' )
+			.val( item.label || '' ) );
+		$row.append( colorSelect( item.color ) );
+		if ( ! isSub ) {
+			$row.append( $( '<input type="text" class="mjml-svc-time" placeholder="Time">' ).val( item.time || '' ) );
+			$row.append( $( '<input type="text" class="mjml-svc-notes">' )
+				.attr( 'placeholder', opts.notesPlaceholder || 'Notes' )
+				.val( item.notes || '' ) );
+		}
+		$row.append( svcHideButton( item ) );
+		if ( opts.duplicate ) {
+			$row.append( $( '<button type="button" class="button-link mjml-svc-dup" title="Duplicate"><span class="dashicons dashicons-admin-page"></span></button>' ) );
+		}
+		$row.append( $( '<button type="button" class="button-link mjml-svc-del" title="Remove">×</button>' ) );
+		return $row;
+	}
+
+	function svcAddButtons() {
+		return '<p class="mjml-svc-add-row">' +
+			'<button type="button" class="button mjml-svc-add">+ Add service</button> ' +
+			'<button type="button" class="button mjml-svc-add-sub">+ Add sub-heading</button>' +
+			'</p>';
+	}
+
 	function buildServiceItemsEditor( block, key ) {
 		var $wrap = $( '<div class="mjml-repeat" data-key="' + key + '"></div>' );
 		$wrap.append( '<p class="mjml-field-label">Service items</p>' );
 		var $list = $( '<div class="mjml-repeat-list"></div>' );
 		( block[ key ] || [] ).forEach( function(item, i) {
-			var $row = $( '<div class="mjml-repeat-row"></div>' )
-				.attr( 'data-index', i )
-				.toggleClass( 'is-hidden', !! item.hidden );
-			$row.append( $( '<input type="text" class="mjml-svc-label" placeholder="Label (bold)">' ).val( item.label || '' ) );
-			$row.append( colorSelect( item.color ) );
-			$row.append( $( '<input type="text" class="mjml-svc-time" placeholder="Time">' ).val( item.time || '' ) );
-			$row.append( $( '<input type="text" class="mjml-svc-notes" placeholder="Notes (after time)">' ).val( item.notes || '' ) );
-			$row.append( svcHideButton( item ) );
-			$row.append( $( '<button type="button" class="button-link mjml-svc-del" title="Remove">×</button>' ) );
-			$list.append( $row );
+			$list.append( buildServiceRow( item, i, { notesPlaceholder: 'Notes (after time)' } ) );
 		} );
 		$wrap.append( $list );
-		$wrap.append( '<button type="button" class="button mjml-svc-add">+ Add service</button>' );
+		$wrap.append( svcAddButtons() );
 		return $wrap;
 	}
 
@@ -1142,22 +1176,11 @@ jQuery( function ( $ ) {
 			( col.items || [] ).forEach( function(item, i) {
 				// data-orig-side stamps the source column so a cross-column drag
 				// can still locate the original item in block[side].items.
-				var $row = $( '<div class="mjml-repeat-row"></div>' )
-					.attr( 'data-index', i )
-					.attr( 'data-orig-side', side )
-					.toggleClass( 'is-hidden', !! item.hidden );
-				$row.append( '<span class="mjml-svc-drag dashicons dashicons-move" title="Drag to reorder or move between columns"></span>' );
-				$row.append( $( '<input type="text" class="mjml-svc-label" placeholder="Label (bold)">' ).val( item.label || '' ) );
-				$row.append( colorSelect( item.color ) );
-				$row.append( $( '<input type="text" class="mjml-svc-time" placeholder="Time">' ).val( item.time || '' ) );
-				$row.append( $( '<input type="text" class="mjml-svc-notes" placeholder="Notes">' ).val( item.notes || '' ) );
-				$row.append( svcHideButton( item ) );
-				$row.append( $( '<button type="button" class="button-link mjml-svc-dup" title="Duplicate"><span class="dashicons dashicons-admin-page"></span></button>' ) );
-				$row.append( $( '<button type="button" class="button-link mjml-svc-del" title="Remove">×</button>' ) );
-				$list.append( $row );
+				$list.append( buildServiceRow( item, i, { drag: true, duplicate: true } )
+					.attr( 'data-orig-side', side ) );
 			} );
 			$col.append( $list );
-			$col.append( '<button type="button" class="button mjml-svc-add">+ Add service</button>' );
+			$col.append( svcAddButtons() );
 			$wrap.append( $col );
 		} );
 		return $wrap;
@@ -1602,11 +1625,14 @@ jQuery( function ( $ ) {
 			}
 			if ( ! arr || ! arr[ index ] ) return;
 			var item = arr[ index ];
-			item.label  = $entry.find( '.mjml-svc-label'  ).val();
-			item.detail = $entry.find( '.mjml-svc-detail' ).val();
-			item.time   = $entry.find( '.mjml-svc-time'   ).val();
-			item.notes  = $entry.find( '.mjml-svc-notes'  ).val();
-			item.color  = $entry.find( '.mjml-svc-color'  ).val();
+			// Sub-heading rows omit the time/notes inputs, so copy only the
+			// fields this row actually renders instead of blanking the others.
+			[ [ '.mjml-svc-label', 'label' ], [ '.mjml-svc-detail', 'detail' ],
+				[ '.mjml-svc-time', 'time' ], [ '.mjml-svc-notes', 'notes' ],
+				[ '.mjml-svc-color', 'color' ] ].forEach( function( pair ) {
+				var $input = $entry.find( pair[0] );
+				if ( $input.length ) item[ pair[1] ] = $input.val();
+			} );
 			if ( $entry.find( '.mjml-svc-bold' ).length ) {
 				item.bold = $entry.find( '.mjml-svc-bold' ).is( ':checked' );
 			}
@@ -1642,6 +1668,21 @@ jQuery( function ( $ ) {
 					block[ key ].push( { label: '', color: '', time: '', notes: '' } );
 				}
 			}
+			rebuildBlockFields( block );
+			markDirty();
+		} )
+
+		.on( 'click', '.mjml-svc-add-sub', function( e ) {
+			e.preventDefault();
+			var $row  = $( this ).closest( '.mjml-block-row' );
+			var block = blocks.find( function(b) { return b.id === $row.data( 'id' ); } );
+			if ( ! block ) return;
+			var side = $( this ).closest( '.mjml-twocol-side' ).data( 'side' );
+			var arr  = side && block[ side ]
+				? block[ side ].items
+				: block[ $( this ).closest( '.mjml-repeat' ).data( 'key' ) ];
+			if ( ! arr ) return;
+			arr.push( { kind: 'sub', label: '', color: '' } );
 			rebuildBlockFields( block );
 			markDirty();
 		} )
@@ -2072,8 +2113,37 @@ jQuery( function ( $ ) {
 		return '<li>' + labelHtml + time + notes + '</li>';
 	}
 
+	// Sub-heading inside a service list: closes the current <ul> and introduces
+	// the next group of times (e.g. "Mincha Only" above the weekday services).
+	function renderServiceSubheading( item ) {
+		var text = item.label || '';
+		if ( ! text ) return '';
+		// Inline margins so sub-sections space correctly in every theme without
+		// each one needing its own .svc-sub rule (themes can still override).
+		return '<p class="svc-sub" style="margin:16px 0 0">' +
+			( item.color ? '<span class="' + esc( item.color ) + '">' + esc( text ) + '</span>' : esc( text ) ) +
+			'</p>';
+	}
+
+	// Walk the items, starting a fresh <ul> after every sub-heading so the list
+	// breaks into sub-sections instead of running on as one list.
+	function renderServiceItems( items ) {
+		var html = '', open = false;
+		( items || [] ).forEach( function( item ) {
+			if ( ! item || item.hidden ) return;
+			if ( isSubItem( item ) ) {
+				if ( open ) { html += '</ul>'; open = false; }
+				html += renderServiceSubheading( item );
+				return;
+			}
+			if ( ! open ) { html += '<ul>'; open = true; }
+			html += renderServiceItem( item );
+		} );
+		return open ? html + '</ul>' : html;
+	}
+
 	function renderServiceList( block ) {
-		var lis   = ( block.items || [] ).filter( function(i) { return ! i.hidden; } ).map( renderServiceItem ).join( '' );
+		var list  = renderServiceItems( block.items );
 		var intro = block.intro ? '<p>' + block.intro + '</p>' : '';
 		// TinyMCE wraps content in its own <p>; without stripping it we'd emit
 		// <p class="small"><p>...</p></p>, which compiles to extra blank lines.
@@ -2082,7 +2152,7 @@ jQuery( function ( $ ) {
 			'<mj-text padding-top="0" padding-bottom="0">' +
 			( block.title ? '<h3>' + esc( block.title ) + '</h3>' : '' ) +
 			intro +
-			'<ul>' + lis + '</ul>' +
+			list +
 			foot +
 			'<br /></mj-text>' +
 			'</mj-column></mj-section>';
@@ -2093,8 +2163,7 @@ jQuery( function ( $ ) {
 		var titleHtml = col.title
 			? '<h3' + ( col.title_color ? ' class="' + esc( col.title_color ) + '"' : '' ) + '>' + esc( col.title ) + '</h3>'
 			: '';
-		var lis = ( col.items || [] ).filter( function(i) { return ! i.hidden; } ).map( renderServiceItem ).join( '' );
-		return '<mj-column><mj-text>' + titleHtml + '<ul>' + lis + '</ul></mj-text></mj-column>';
+		return '<mj-column><mj-text>' + titleHtml + renderServiceItems( col.items ) + '</mj-text></mj-column>';
 	}
 
 	function renderServiceListTwo( block ) {
