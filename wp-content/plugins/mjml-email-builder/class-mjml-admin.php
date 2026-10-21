@@ -191,7 +191,7 @@ class MJML_Admin {
 			'i18n'          => array(
 				'saving'     => __( 'Saving…', 'mjml-email-builder' ),
 				'saved'      => __( 'All changes saved', 'mjml-email-builder' ),
-				'converting' => __( 'Compiling…', 'mjml-email-builder' ),
+				'converting' => __( 'Rendering…', 'mjml-email-builder' ),
 				'copied'     => __( 'Copied!', 'mjml-email-builder' ),
 				'copy'       => __( 'Copy HTML', 'mjml-email-builder' ),
 				'error'      => __( 'Error: ', 'mjml-email-builder' ),

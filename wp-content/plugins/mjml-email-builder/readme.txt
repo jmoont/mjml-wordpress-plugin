@@ -4,7 +4,7 @@ Tags: mjml, email, templates, newsletter
 Requires at least: 5.8
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 2.4.13
+Stable tag: 2.4.22
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,7 +24,7 @@ Compilation happens entirely in your browser using `mjml-browser`, so the plugin
 * **Browser-side compile** — uses the bundled `mjml-browser` CDN library; no API key required.
 * **Multiple themes** — bundle global styles, header, and footer into named themes; pick one per email or change the default. The active theme drives the WYSIWYG Format dropdown so its classes are one click away.
 * **Auto-save with undo** — debounced 1.5 s auto-save with conflict-free retry, an `unload` beacon so changes survive a tab close, and an Undo button that walks back through the last 10 revisions (title, blocks, and theme).
-* **Live preview** — sticky preview panel renders the compiled HTML in a sandboxed iframe.
+* **Live preview** — sticky preview panel renders the compiled HTML in a sandboxed iframe, in a draggable split you can resize (the width is remembered), and it scrolls to the block you're editing on each re-render.
 * **Section-aware navbar** — section headers can opt in to the navigation menu; an optional override sets a different label; the navbar lead-in text and spacers are configurable.
 * **Author + archive** — list view shows the author and supports archiving emails to a separate Archived tab.
 * **Export / Import** — JSON export bundles every theme plus the 10 most recently modified emails; import overrides themes and appends emails (5 MB upload cap).
@@ -32,7 +32,7 @@ Compilation happens entirely in your browser using `mjml-browser`, so the plugin
 = How it works =
 
 1. Compose a template by adding blocks. Each block produces an `<mj-section>` (or equivalent) when compiled.
-2. Click **Compile to HTML** (or wait for the auto-save) to render the full MJML document — themes wrap your blocks with their styles, header, and footer.
+2. Click **Render Preview** (or wait for the auto-save) to render the full MJML document — themes wrap your blocks with their styles, header, and footer.
 3. Click **Copy HTML** to grab the rendered HTML for use in your sending tool.
 
 = Storage model =
@@ -73,6 +73,42 @@ Use **Settings → Export** to download a JSON bundle containing your themes plu
 Yes. The preview iframe runs with `sandbox="allow-same-origin"` only — scripts inside the email cannot execute. Email clients don't run scripts either, so this matches real-world behaviour.
 
 == Changelog ==
+
+= 2.4.22 =
+* Undo joins the floating bar, so it reads Undo · Render Preview · Copy HTML wherever you are in a long email. It drives the same action as the topbar button and greys out with it when there's nothing left to undo.
+* The post-undo prompt ("Showing previous version — Render Preview or edit to save") now also appears as a toast, in amber, for seven seconds — previously it was only in the topbar status line, which you couldn't see if you'd undone while scrolled down.
+
+= 2.4.21 =
+* Fix: after an Undo, the status line still told you to click "Compile" — a button that no longer exists under that name. It now says "Showing previous version — Render Preview or edit to save", matching the renamed button.
+
+= 2.4.20 =
+* "Compile to HTML" is now called **Render Preview** (the status text says "Rendering…" to match) — it's what the button actually does, since the HTML is produced on every auto-save regardless.
+* **Copy HTML** is now the primary (blue) button and sits last in the topbar, with Render Preview beside it in plain styling.
+* Both buttons now float in a small bar at the top-right of the screen whenever the topbar is scrolled out of view, so you can render or copy from anywhere in a long email without scrolling back up. They drive exactly the same actions, and the floating Render Preview greys out alongside the topbar one while a render is in progress.
+* Fix: copying silently did nothing if the browser's clipboard API rejected the write (an unfocused document or a denied permission). It now falls back to the older copy method and, if that fails too, says so in the status bar and toast.
+
+= 2.4.19 =
+* The save toast now tracks the whole save: it appears as "Saving…" with a spinner the moment a save starts, then turns into "All changes saved" in place when it finishes (and fades out a couple of seconds later), so you can see that a save is happening rather than only that it happened. A save in progress can't be clicked away; a completed save or an error can. Starting a new edit clears the toast, so what's on screen always reflects the current state.
+
+= 2.4.18 =
+* Save confirmations now appear as a toast in the bottom-right corner, so you can see that an edit saved without scrolling back up to the topbar status text. It fades out after a couple of seconds, or click it to dismiss. Errors use the same toast in red and stay for eight seconds, so a failed save or compile is no longer easy to miss on a long email.
+
+= 2.4.17 =
+* Fix: a failure while compiling could silently wedge auto-save for the rest of the session. jQuery skips the handler that clears the "saving" flag when an earlier callback throws, so one compile error left the editor stuck on "Unsaved changes", never saving again and giving no clue why. Compiling is now contained: the error is reported in the status bar (and logged to the browser console) and saving carries on.
+* Fix: a missing preview iframe no longer takes compiling and saving down with it — the email still saves and caches, and the skipped preview is logged.
+
+= 2.4.16 =
+* Fix: the per-block preview markers added in 2.4.15 could corrupt a Raw MJML block's opening tag — a self-closing `<mj-section ... />` became `<mj-section ... / css-class="…">`, and a tag using single-quoted `css-class='…'` ended up with the attribute twice. Both now tag correctly, so Raw MJML blocks compile as before.
+* Hardening: positioning the preview after a re-render can no longer interrupt compiling or auto-saving, and a stale scroll handler from an earlier compile is discarded instead of firing against the new render.
+
+= 2.4.15 =
+* Editor layout: the block builder and the preview are now a draggable split — drag the divider between them to trade width, double-click it to reset, or focus it and use the arrow keys. The width is remembered in your browser. The two columns also stay side by side much further down (they only stack below 900px wide, rather than 1480px).
+* Editor topbar: "Copy HTML" has moved up from the preview panel header to sit next to "Compile to HTML", and the two secondary actions ("Copy MJML" and "Clear all content") now live behind an ellipsis (⋮) menu at the end of the row.
+* Adding a block now inserts it directly after the block you were last working in (including when you were typing in a WYSIWYG), instead of after the last expanded block.
+* The preview now scrolls to the block you're editing when it re-renders. Clicking "Compile to HTML" always re-centres that block; a background auto-save compile only scrolls when you've moved to a different block, so it never undoes your own scrolling mid-edit. The markers that make this work are stripped from the HTML you copy or that gets cached, so the output is unchanged.
+
+= 2.4.14 =
+* Image block: new optional "Width in pixels" field. Leave it blank for the existing full-width behaviour, or enter a pixel width to emit `width="…"` on the `<mj-image>`. The value is always normalised to px (`300`, `300px` and `300 px` all compile to `width="300px"`) because `mj-image` only handles pixel widths reliably; anything non-numeric is ignored. The block summary shows the width when one is set.
 
 = 2.4.13 =
 * Yahrzeits block: simple inline formatting in the names textarea — wrap text in `*asterisks*` for bold or `_underscores_` for italic (e.g. a `*Tuesday 23 June*` heading at the top of the list). Blank lines now insert an extra line break instead of being silently dropped, so you can group entries visually. Auto-split into two columns now counts non-blank lines so columns stay balanced when blanks are interspersed.

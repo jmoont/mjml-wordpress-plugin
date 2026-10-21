@@ -96,7 +96,7 @@ jQuery( function ( $ ) {
 	var isUndoing     = false;
 
 	function refreshUndoButton() {
-		var $btn   = $( '#mjml-undo-btn' );
+		var $btn   = $( '#mjml-undo-btn, #mjml-float-undo-btn' );
 		var postId = $( '#mjml-post-id' ).val();
 		if ( ! postId || postId === '0' ) { $btn.prop( 'disabled', true ); return; }
 		// We only know the count after fetching once; until then assume we can try.
@@ -133,8 +133,8 @@ jQuery( function ( $ ) {
 		// Don't markDirty — undo navigation shouldn't auto-save (each save would
 		// burn a revision slot and prune the oldest, capping you at ~5 useful
 		// undoes). Editor state is replaced, but we leave isDirty=false. Click
-		// Compile to commit the rolled-back state, or just keep typing — the
-		// next user edit will fire markDirty and the auto-save will persist
+		// Render Preview to commit the rolled-back state, or just keep typing —
+		// the next user edit will fire markDirty and the auto-save will persist
 		// the undone-then-edited state.
 		isUndoing = false;
 		isDirty   = false;
@@ -150,7 +150,11 @@ jQuery( function ( $ ) {
 		} ).done( function(r) {
 			if ( r && r.success ) {
 				applyRevisionData( r.data );
-				setStatus( 'Showing previous version — Compile or edit to save', 'unsaved' );
+				var notice = 'Showing previous version — Render Preview or edit to save';
+				setStatus( notice, 'unsaved' );
+				// setStatus() clears the toast for "unsaved", so raise this one
+				// after it: the prompt is the whole point of the undo.
+				showToast( notice, 'info' );
 			} else {
 				setStatus( 'Could not load revision', 'error' );
 			}
@@ -322,6 +326,14 @@ jQuery( function ( $ ) {
 	// ── TinyMCE helpers ──────────────────────────────────────────────────────
 	var expandedTextBlocks = {}; // { blockId: true } — tracks which text blocks have open editors
 
+	// The block the user was last working in. Drives where a newly added block is
+	// inserted and which block the preview scrolls to after a re-compile.
+	var lastFocusedBlockId = null;
+
+	function setLastFocusedBlock( id ) {
+		if ( id ) lastFocusedBlockId = id;
+	}
+
 	// Strip pasted HTML down to basic formatting only (bold, italic, lists, links).
 	// Used by the paste plugin's paste_preprocess hook on every WYSIWYG.
 	function cleanPastedHtml( html ) {
@@ -371,6 +383,7 @@ jQuery( function ( $ ) {
 				style_formats:      styleFormats.length ? styleFormats : [ { title: '— No theme classes defined —', inline: 'span', classes: '' } ],
 				content_style:      buildContentStyle(),
 				setup: function( editor ) {
+					editor.on( 'focus', function() { setLastFocusedBlock( blockId ); } );
 					editor.on( 'change input keyup NodeChange', function() {
 						var block = blocks.find( function(b) { return b.id === blockId; } );
 						if ( block ) block.content = editor.getContent();
@@ -434,6 +447,7 @@ jQuery( function ( $ ) {
 				style_formats:      styleFormats.length ? styleFormats : [ { title: '— No theme classes defined —', inline: 'span', classes: '' } ],
 				content_style:      buildContentStyle(),
 				setup: function( editor ) {
+					editor.on( 'focus', function() { setLastFocusedBlock( blockId ); } );
 					editor.on( 'change input keyup NodeChange', function() {
 						var block = blocks.find( function(b) { return b.id === blockId; } );
 						if ( block ) block[ fieldKey ] = editor.getContent();
@@ -551,8 +565,21 @@ jQuery( function ( $ ) {
 				if ( window.history && window.history.replaceState ) {
 					window.history.replaceState( {}, '', resp.data.edit_url );
 				}
-				doCompile( true );
-				refreshUndoButton();
+				// Compiling and the undo refresh are follow-on work: if either
+				// throws, jQuery would skip .always() below and isSaving would
+				// stay true, silently wedging every later auto-save. Keep the
+				// failure visible but contained.
+				try {
+					doCompile( true );
+				} catch ( err ) {
+					console.error( 'MJML compile failed:', err );
+					setStatus( mjmlEb.i18n.error + ( err && err.message ? err.message : 'compile failed' ), 'error' );
+				}
+				try {
+					refreshUndoButton();
+				} catch ( err ) {
+					console.error( 'MJML undo refresh failed:', err );
+				}
 				if ( typeof onDone === 'function' ) onDone();
 			} else {
 				isDirty = true;
@@ -600,6 +627,69 @@ jQuery( function ( $ ) {
 	function setStatus( msg, state ) {
 		var $s = $( '#mjml-status' );
 		$s.text( msg ).attr( 'data-state', state || '' );
+
+		// The status text lives in the topbar, which scrolls out of sight on a
+		// long email — mirror the states worth noticing into a toast. Anything
+		// else (e.g. "Unsaved changes" while typing) clears a toast still up.
+		if ( state === 'saving' || state === 'saved' || state === 'error' ) {
+			showToast( msg, state );
+		} else {
+			hideToast();
+		}
+	}
+
+	// ── Save / error toast ───────────────────────────────────────────────────
+	var toastTimer = null;
+
+	var TOAST_ICONS = {
+		saving: 'dashicons-update',
+		saved:  'dashicons-yes-alt',
+		error:  'dashicons-warning',
+		info:   'dashicons-info',
+	};
+
+	function showToast( msg, state ) {
+		// Editor-only: the list and settings pages have no status element.
+		if ( ! $( '#mjml-status' ).length ) return;
+
+		var $toast = $( '#mjml-eb-toast' );
+		if ( ! $toast.length ) {
+			$toast = $( '<div id="mjml-eb-toast" class="mjml-eb-toast" role="status" aria-live="polite"></div>' )
+				.append( '<span class="dashicons"></span><span class="mjml-eb-toast-text"></span>' )
+				.appendTo( 'body' )
+				.on( 'click', function() {
+					// Don't let a click dismiss a save still in flight.
+					if ( $( this ).attr( 'data-state' ) !== 'saving' ) hideToast();
+				} );
+		}
+
+		var wasVisible = $toast.hasClass( 'is-visible' );
+
+		$toast.attr( 'data-state', state );
+		$toast.find( '.dashicons' ).attr( 'class', 'dashicons ' + ( TOAST_ICONS[ state ] || TOAST_ICONS.saved ) );
+		$toast.find( '.mjml-eb-toast-text' ).text( msg );
+
+		// "Saving…" morphs into "All changes saved" in place — only animate in
+		// when the toast wasn't already on screen, so it doesn't flicker.
+		if ( ! wasVisible ) {
+			$toast.removeClass( 'is-visible' );
+			void $toast[0].offsetWidth;
+			$toast.addClass( 'is-visible' );
+		}
+
+		clearTimeout( toastTimer );
+		// A save in progress stays up until it resolves. Errors and prompts stay
+		// long enough to read and act on; a completed save is just a glance.
+		if ( state === 'saving' ) return;
+		var life = 2200;
+		if ( state === 'error' ) life = 8000;
+		if ( state === 'info' )  life = 7000;
+		toastTimer = setTimeout( hideToast, life );
+	}
+
+	function hideToast() {
+		clearTimeout( toastTimer );
+		$( '#mjml-eb-toast' ).removeClass( 'is-visible' );
 	}
 
 	// Title changes trigger auto-save
@@ -611,7 +701,7 @@ jQuery( function ( $ ) {
 		section_header: function() { return { type: 'section_header', id: makeId(), title: 'Section Title', anchor_id: 'section-title', include_in_nav: true, padding_top: '20px', padding_bottom: '20px' }; },
 		text:           function() { return { type: 'text', id: makeId(), content: '<p>Your content here.</p>', css_class: '' }; },
 		update:         function() { return { type: 'update', id: makeId(), content: '<p><strong>UPDATE:</strong> </p>', highlight_class: 'error_header' }; },
-		image:          function() { return { type: 'image', id: makeId(), src: '', href: '' }; },
+		image:          function() { return { type: 'image', id: makeId(), src: '', href: '', width: '' }; },
 		button:         function() { return { type: 'button', id: makeId(), text: 'Click Here', href: '#', background_color: '#0047B2' }; },
 		divider:        function() { return { type: 'divider', id: makeId(), border_color: '#12142F' }; },
 		spacer:         function() { return { type: 'spacer', id: makeId(), height: '20px' }; },
@@ -828,7 +918,7 @@ jQuery( function ( $ ) {
 			case 'section_header':   return block.title;
 			case 'text':             return $( '<div>' ).html( block.content ).text().substring( 0, 80 ) + '…';
 			case 'update':           return $( '<div>' ).html( block.content ).text().substring( 0, 80 ) + '…';
-			case 'image':            return block.src || '(no image set)';
+			case 'image':            return ( block.src || '(no image set)' ) + ( pxLength( block.width ) ? ' · ' + pxLength( block.width ) : '' );
 			case 'button':           return block.text;
 			case 'divider':          return 'border: ' + block.border_color;
 			case 'spacer':           return 'height: ' + block.height;
@@ -950,6 +1040,7 @@ jQuery( function ( $ ) {
 				$srcWrap.append( $srcLabel );
 				$f.append( $srcWrap );
 				$f.append( field( 'Link URL', textInput( 'href', block.href ) ) );
+				$f.append( field( 'Width in pixels (optional)', textInput( 'width', block.width, 'e.g. 300 — blank for full width' ) ) );
 				break;
 
 			case 'button':
@@ -1305,6 +1396,11 @@ jQuery( function ( $ ) {
 	// ── Block list interactions ──────────────────────────────────────────────
 	$( '#mjml-blocks-list' )
 
+		// Remember the block being worked in — see lastFocusedBlockId.
+		.on( 'focusin mousedown', '.mjml-block-row', function() {
+			setLastFocusedBlock( $( this ).data( 'id' ) );
+		} )
+
 		.on( 'click', '.mjml-block-toggle', function( e ) {
 			e.stopPropagation();
 			var $row    = $( this ).closest( '.mjml-block-row' );
@@ -1312,6 +1408,8 @@ jQuery( function ( $ ) {
 			var $fields = $row.find( '.mjml-block-fields' );
 			var $icon   = $( this ).find( '.dashicons' );
 			var opening = ! $fields.is( ':visible' );
+
+			if ( opening ) setLastFocusedBlock( blockId );
 
 			$fields.slideToggle( 150, function() {
 				var visible = $fields.is( ':visible' );
@@ -1440,6 +1538,7 @@ jQuery( function ( $ ) {
 			if ( block && block.locked ) return; // belt-and-suspenders: button is hidden via CSS, but ignore stray clicks too
 			if ( block && block.type === 'text' )       removeTextEditor( id );
 			if ( block && blockHasInlineEditors( block ) ) removeInlineWysiwygsForBlock( id );
+			if ( lastFocusedBlockId === id ) lastFocusedBlockId = null;
 			blocks = blocks.filter( function(b) { return b.id !== id; } );
 			renderAll();
 			markDirty();
@@ -1721,11 +1820,17 @@ jQuery( function ( $ ) {
 
 		var newBlock = DEFAULTS[ type ]();
 
-		// If a block is currently expanded, insert the new block right after it
-		var $expanded   = $( '#mjml-blocks-list .mjml-block-row' ).filter( function() {
-			return $( this ).find( '> .mjml-block-fields' ).is( ':visible' );
-		} ).last();
-		var insertAfter = $expanded.length ? $expanded.data( 'id' ) : null;
+		// Insert the new block right after the one the user was last working in,
+		// falling back to the last expanded block, then to the end of the list.
+		var insertAfter = null;
+		if ( lastFocusedBlockId && blocks.some( function(b) { return b.id === lastFocusedBlockId; } ) ) {
+			insertAfter = lastFocusedBlockId;
+		} else {
+			var $expanded = $( '#mjml-blocks-list .mjml-block-row' ).filter( function() {
+				return $( this ).find( '> .mjml-block-fields' ).is( ':visible' );
+			} ).last();
+			if ( $expanded.length ) insertAfter = $expanded.data( 'id' );
+		}
 
 		if ( insertAfter ) {
 			var idx = blocks.findIndex( function(b) { return b.id === insertAfter; } );
@@ -1734,6 +1839,8 @@ jQuery( function ( $ ) {
 		} else {
 			blocks.push( newBlock );
 		}
+
+		setLastFocusedBlock( newBlock.id );
 
 		renderAll();
 		var $row = $( '#mjml-blocks-list .mjml-block-row[data-id="' + newBlock.id + '"]' );
@@ -1758,6 +1865,69 @@ jQuery( function ( $ ) {
 	// has clicked Compile.
 	var lastCompiledHtml = mjmlEb.compiledHtml || '';
 
+	// ── MJML document assembly ───────────────────────────────────────────────
+	// Prefix for the per-block marker classes the preview uses to find a block in
+	// the compiled HTML. Stripped from anything the user copies or we cache.
+	var BLOCK_MARKER_PREFIX = 'mjmlblk-';
+
+	// Tag a block's rendered MJML with its marker class so the preview can scroll
+	// to it. The class goes on the block's first <mj-section> (or <mj-wrapper>),
+	// appended to any css-class the block already sets. Blocks that emit neither
+	// tag — some Raw MJML — are left alone and simply aren't scroll targets.
+	function tagBlockMjml( mjml, block ) {
+		var marker = BLOCK_MARKER_PREFIX + block.id;
+		var open   = /<mj-(?:section|wrapper)\b/i.exec( mjml );
+		if ( ! open ) return mjml;
+
+		var tagEnd = mjml.indexOf( '>', open.index );
+		if ( tagEnd === -1 ) return mjml;
+
+		// Raw MJML is hand-written, so the tag may be self-closing and may quote
+		// attributes with either kind of quote — keep both intact.
+		var tag       = mjml.slice( open.index, tagEnd );
+		var selfClose = /\/\s*$/.test( tag );
+		var body      = selfClose ? tag.replace( /\/\s*$/, '' ) : tag;
+		var existing  = /css-class\s*=\s*("[^"]*"|'[^']*')/i.exec( body );
+
+		if ( existing ) {
+			var quote = existing[1].charAt( 0 );
+			var value = existing[1].slice( 1, -1 );
+			body = body.replace( existing[0], 'css-class=' + quote + ( value ? value + ' ' : '' ) + marker + quote );
+		} else {
+			body = body.replace( /\s+$/, '' ) + ' css-class="' + marker + '"';
+		}
+
+		return mjml.slice( 0, open.index ) + body + ( selfClose ? ' /' : '' ) + mjml.slice( tagEnd );
+	}
+
+	// Remove the marker classes again, so copied/cached HTML matches what the
+	// blocks alone would have produced.
+	function stripBlockMarkers( html ) {
+		return String( html || '' )
+			.replace( new RegExp( '\\s*\\b' + BLOCK_MARKER_PREFIX + '[a-z0-9]+\\b', 'gi' ), '' )
+			.replace( /\s*class=""/g, '' );
+	}
+
+	// Build the full MJML document for the current blocks and theme. With
+	// markers:true each block carries its marker class (preview only).
+	function buildMjmlDoc( opts ) {
+		var markers      = !! ( opts && opts.markers );
+		var bodySections = blocks
+			.filter( function(b) { return ! b.hidden; } )
+			.map( function(b) {
+				var mjml = renderBlockToMjml( b );
+				return markers ? tagBlockMjml( mjml, b ) : mjml;
+			} )
+			.join( '\n' );
+
+		return '<mjml>\n  <mj-head>\n' + ( activeTheme.styles || '' ) + '\n  </mj-head>\n' +
+			'  <mj-body>\n' +
+			( activeTheme.header || '' ) + '\n' +
+			bodySections + '\n' +
+			( activeTheme.footer || '' ) + '\n' +
+			'  </mj-body>\n</mjml>';
+	}
+
 	// ── Compile ──────────────────────────────────────────────────────────────
 	function doCompile( silent ) {
 		syncAllEditors();
@@ -1766,16 +1936,9 @@ jQuery( function ( $ ) {
 			return;
 		}
 		if ( ! silent ) setStatus( mjmlEb.i18n.converting, 'saving' );
-		$( '#mjml-convert-btn' ).prop( 'disabled', true );
+		setCompileDisabled( true );
 
-		var bodySections = blocks.filter( function(b) { return ! b.hidden; } ).map( renderBlockToMjml ).join( '\n' );
-		var mjmlDoc =
-			'<mjml>\n  <mj-head>\n' + ( activeTheme.styles || '' ) + '\n  </mj-head>\n' +
-			'  <mj-body>\n' +
-			( activeTheme.header || '' ) + '\n' +
-			bodySections + '\n' +
-			( activeTheme.footer || '' ) + '\n' +
-			'  </mj-body>\n</mjml>';
+		var mjmlDoc = buildMjmlDoc( { markers: true } );
 
 		var result;
 		try {
@@ -1790,7 +1953,7 @@ jQuery( function ( $ ) {
 			} );
 		} catch ( err ) {
 			setStatus( mjmlEb.i18n.error + err.message, 'error' );
-			$( '#mjml-convert-btn' ).prop( 'disabled', false );
+			setCompileDisabled( false );
 			return;
 		}
 
@@ -1809,15 +1972,28 @@ jQuery( function ( $ ) {
 		}
 
 		if ( ! silent ) setStatus( mjmlEb.i18n.saved, 'saved' );
-		lastCompiledHtml = result.html;
+
+		// The compiled document carries the per-block markers; everything that
+		// leaves the editor (clipboard, cached HTML) gets them stripped.
+		var cleanHtml = stripBlockMarkers( result.html );
+		lastCompiledHtml = cleanHtml;
 
 		// Strip <script> tags before previewing: real email clients block JS, and
 		// our preview iframe is sandboxed without allow-scripts so any <script> in
 		// the output produces a "Blocked script execution in about:srcdoc" warning.
 		var previewHtml = result.html.replace( /<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, '' );
-		document.getElementById( 'mjml-preview-frame' ).srcdoc = previewHtml;
-		$( '#mjml-output-panel' ).show();
-		$( '#mjml-convert-btn' ).prop( 'disabled', false );
+		var frame       = document.getElementById( 'mjml-preview-frame' );
+
+		// The iframe should always be there, but if something removed it the
+		// compile itself still succeeded — keep saving and caching rather than
+		// throwing and taking auto-save down with it.
+		if ( frame ) {
+			renderPreview( frame, previewHtml, silent );
+		} else {
+			console.warn( 'MJML preview iframe is missing — skipping preview render.' );
+		}
+
+		setCompileDisabled( false );
 
 		var postId = $( '#mjml-post-id' ).val();
 		if ( postId && postId !== '0' ) {
@@ -1825,15 +2001,181 @@ jQuery( function ( $ ) {
 				action:  'mjml_cache_html',
 				nonce:   mjmlEb.nonces.cache,
 				post_id: postId,
-				html:    result.html,
+				html:    cleanHtml,
 			} );
 		}
 	}
 
+	// ── Preview rendering ────────────────────────────────────────────────────
+	// Swap the compiled HTML into the iframe, then put the scroll position back
+	// where it belongs: on the block being edited if the focus has moved there,
+	// otherwise exactly where the user had scrolled to.
+	function renderPreview( frame, previewHtml, silent ) {
+		var prevScroll = previewScrollTop();
+
+		// An explicit Compile always re-centres the focused block; a background
+		// auto-save compile only does so when the focus has moved to another
+		// block, so it never undoes the user's own scrolling mid-edit. (Clicking
+		// Compile runs through doSave, which compiles silently — hence the flag.)
+		var wantBlock = ( forcePreviewScroll || ! silent || lastFocusedBlockId !== lastScrolledBlockId )
+			? lastFocusedBlockId
+			: null;
+		forcePreviewScroll = false;
+
+		// .off() first so a handler left over from a previous compile can't fire
+		// against this render. Positioning the preview must never be able to break
+		// the compile/save chain, hence the try/catch.
+		$( frame ).off( 'load.mjmlPreview' ).one( 'load.mjmlPreview', function() {
+			try {
+				var applyScroll = function() {
+					if ( ! ( wantBlock && scrollPreviewToBlock( wantBlock ) ) ) {
+						setPreviewScrollTop( prevScroll );
+					}
+				};
+				applyScroll();
+				// Remote images can still be loading, which shifts everything below
+				// them once they arrive — position again once they've settled.
+				whenPreviewImagesSettle( applyScroll );
+			} catch ( e ) {
+				console.warn( 'MJML preview scroll skipped:', e );
+			}
+		} );
+
+		frame.srcdoc = previewHtml;
+		$( '#mjml-output-panel' ).show();
+	}
+
+	// ── Preview scrolling ────────────────────────────────────────────────────
+	// Which block the preview was last scrolled to, so repeated auto-save
+	// compiles for the same block leave the preview where the user left it.
+	var lastScrolledBlockId = null;
+
+	// The preview is same-origin (sandbox="allow-same-origin"), but srcdoc can be
+	// mid-swap, so every document access is guarded.
+	function previewDoc() {
+		try {
+			var frame = document.getElementById( 'mjml-preview-frame' );
+			return frame && frame.contentDocument ? frame.contentDocument : null;
+		} catch ( e ) {
+			return null;
+		}
+	}
+
+	function previewScrollTop() {
+		var doc = previewDoc();
+		if ( ! doc ) return 0;
+		try {
+			return ( doc.documentElement && doc.documentElement.scrollTop ) || ( doc.body && doc.body.scrollTop ) || 0;
+		} catch ( e ) {
+			return 0;
+		}
+	}
+
+	function setPreviewScrollTop( top ) {
+		var doc = previewDoc();
+		if ( ! doc ) return;
+		try {
+			if ( doc.documentElement ) doc.documentElement.scrollTop = top;
+			if ( doc.body )            doc.body.scrollTop            = top;
+		} catch ( e ) {}
+	}
+
+	// Run the callback once every image still loading in the preview has either
+	// loaded or failed. Does nothing if they're all settled already.
+	function whenPreviewImagesSettle( cb ) {
+		var doc = previewDoc();
+		if ( ! doc ) return;
+		var pending;
+		try {
+			pending = Array.prototype.slice.call( doc.images || [] ).filter( function( img ) { return ! img.complete; } );
+		} catch ( e ) {
+			return;
+		}
+		if ( ! pending.length ) return;
+
+		var left = pending.length;
+		pending.forEach( function( img ) {
+			var done = function() {
+				img.removeEventListener( 'load', done );
+				img.removeEventListener( 'error', done );
+				if ( --left === 0 ) cb();
+			};
+			img.addEventListener( 'load', done );
+			img.addEventListener( 'error', done );
+		} );
+	}
+
+	// Scroll the block into view near the top of the preview. Deliberately not
+	// scrollIntoView(), which would also scroll the surrounding admin page.
+	// Returns false when the block has no marker in the compiled output.
+	function scrollPreviewToBlock( blockId ) {
+		var doc = previewDoc();
+		if ( ! doc ) return false;
+		try {
+			var el = doc.querySelector( '.' + BLOCK_MARKER_PREFIX + blockId );
+			if ( ! el ) return false;
+			var top = el.getBoundingClientRect().top + previewScrollTop() - 16;
+			setPreviewScrollTop( Math.max( 0, top ) );
+			lastScrolledBlockId = blockId;
+			return true;
+		} catch ( e ) {
+			return false;
+		}
+	}
+
+	// Set when the user asks for a compile themselves, so the preview re-centres
+	// on the focused block even though doSave() compiles silently.
+	var forcePreviewScroll = false;
+
 	$( '#mjml-convert-btn' ).on( 'click', function() {
 		clearTimeout( autoSaveTimer );
+		forcePreviewScroll = true;
 		doSave();
 	} );
+
+	// Both copies of the button are the same action, so disable them together.
+	function setCompileDisabled( flag ) {
+		$( '#mjml-convert-btn, #mjml-float-convert-btn' ).prop( 'disabled', flag );
+	}
+
+	// ── Floating primary actions ─────────────────────────────────────────────
+	// The topbar scrolls away on a long email, so mirror Copy HTML / Render
+	// Preview into a floating bar whenever it's off screen.
+	( function initFloatActions() {
+		var $bar     = $( '#mjml-float-actions' );
+		var $topbar  = $( '.mjml-eb-topbar-actions' );
+		if ( ! $bar.length || ! $topbar.length ) return;
+
+		$( '#mjml-float-undo-btn' ).on( 'click', function( e ) {
+			e.preventDefault();
+			$( '#mjml-undo-btn' ).trigger( 'click' );
+		} );
+
+		$( '#mjml-float-convert-btn' ).on( 'click', function() {
+			$( '#mjml-convert-btn' ).trigger( 'click' );
+		} );
+
+		// Bound directly rather than proxied, so the "Copied!" feedback lands on
+		// the button the user actually clicked.
+		$( '#mjml-float-copy-btn' ).on( 'click', function() {
+			copyToClipboard( lastCompiledHtml, $( this ), mjmlEb.i18n.copy );
+		} );
+
+		function setVisible( visible ) {
+			$bar.prop( 'hidden', ! visible );
+			$( 'body' ).toggleClass( 'mjml-eb-has-float-actions', visible );
+		}
+
+		if ( typeof IntersectionObserver === 'function' ) {
+			new IntersectionObserver( function( entries ) {
+				setVisible( ! entries[0].isIntersecting );
+			} ).observe( $topbar[0] );
+		} else {
+			$( window ).on( 'scroll.mjmlFloat resize.mjmlFloat', function() {
+				setVisible( $topbar[0].getBoundingClientRect().bottom < 0 );
+			} ).trigger( 'scroll.mjmlFloat' );
+		}
+	} )();
 
 	// ── Clear all content (editor topbar) ────────────────────────────────────
 	$( '#mjml-clear-all-btn' ).on( 'click', function() {
@@ -1899,33 +2241,162 @@ jQuery( function ( $ ) {
 
 	// ── Copy MJML ────────────────────────────────────────────────────────────
 	$( '#mjml-copy-mjml-btn' ).on( 'click', function() {
-		var bodySections = blocks.filter( function(b) { return ! b.hidden; } ).map( renderBlockToMjml ).join( '\n' );
-		var mjmlDoc =
-			'<mjml>\n  <mj-head>\n' + ( activeTheme.styles || '' ) + '\n  </mj-head>\n' +
-			'  <mj-body>\n' +
-			( activeTheme.header || '' ) + '\n' +
-			bodySections + '\n' +
-			( activeTheme.footer || '' ) + '\n' +
-			'  </mj-body>\n</mjml>';
-		copyToClipboard( mjmlDoc, $( this ), 'Copy MJML' );
+		copyToClipboard( buildMjmlDoc( { markers: false } ), $( this ), 'Copy MJML' );
 	} );
 
 	function copyToClipboard( text, $btn, resetLabel ) {
 		if ( ! text ) return;
-		if ( navigator.clipboard && navigator.clipboard.writeText ) {
-			navigator.clipboard.writeText( text ).then( function() {
-				$btn.text( mjmlEb.i18n.copied );
-				setTimeout( function() { $btn.text( resetLabel ); }, 2000 );
-			} );
-		} else {
-			var $ta = $( '<textarea style="position:fixed;opacity:0">' ).val( text ).appendTo( 'body' );
-			$ta[0].select();
-			document.execCommand( 'copy' );
-			$ta.remove();
+
+		function confirmCopied() {
 			$btn.text( mjmlEb.i18n.copied );
 			setTimeout( function() { $btn.text( resetLabel ); }, 2000 );
 		}
+
+		// Fallback for browsers without the async clipboard API — and for when it
+		// rejects (an unfocused document or a denied permission), which otherwise
+		// left the button silently doing nothing.
+		function copyViaTextarea() {
+			var $ta = $( '<textarea style="position:fixed;opacity:0">' ).val( text ).appendTo( 'body' );
+			$ta[0].select();
+			var ok = false;
+			try { ok = document.execCommand( 'copy' ); } catch ( e ) {}
+			$ta.remove();
+			if ( ok ) confirmCopied();
+			else      setStatus( mjmlEb.i18n.error + 'could not copy to the clipboard', 'error' );
+		}
+
+		if ( navigator.clipboard && navigator.clipboard.writeText ) {
+			navigator.clipboard.writeText( text ).then( confirmCopied, copyViaTextarea );
+		} else {
+			copyViaTextarea();
+		}
 	}
+
+	// ── Topbar overflow menu ─────────────────────────────────────────────────
+	// Holds the secondary actions (Copy MJML, Clear all content). Their own click
+	// handlers stay where they are; this only opens and closes the popover.
+	( function initMoreMenu() {
+		var $btn  = $( '#mjml-more-btn' );
+		var $menu = $( '#mjml-more-menu' );
+		if ( ! $btn.length || ! $menu.length ) return;
+
+		function close() {
+			$menu.prop( 'hidden', true );
+			$btn.attr( 'aria-expanded', 'false' );
+		}
+
+		$btn.on( 'click', function( e ) {
+			e.stopPropagation();
+			var open = $menu.prop( 'hidden' );
+			$menu.prop( 'hidden', ! open );
+			$btn.attr( 'aria-expanded', open ? 'true' : 'false' );
+		} );
+
+		// Clicking an item runs its own handler and then closes the menu.
+		$menu.on( 'click', '.mjml-more-item', function() { close(); } );
+
+		$( document ).on( 'mousedown', function( e ) {
+			if ( ! $menu.prop( 'hidden' ) && ! $( e.target ).closest( '.mjml-eb-more' ).length ) close();
+		} );
+
+		$( document ).on( 'keydown', function( e ) {
+			if ( e.key === 'Escape' && ! $menu.prop( 'hidden' ) ) {
+				close();
+				$btn.trigger( 'focus' );
+			}
+		} );
+	} )();
+
+	// ── Resizable builder / preview split ────────────────────────────────────
+	// The preview column's width is a CSS custom property on .mjml-eb-layout, so
+	// dragging only ever writes one value. It's remembered per browser.
+	( function initLayoutResizer() {
+		var PREVIEW_W_KEY  = 'mjmlEbPreviewWidth';
+		var DEFAULT_W      = 600;
+		var MIN_PREVIEW_W  = 260;
+		var MIN_BUILDER_W  = 360; // keep the block list usable
+
+		var layout   = document.querySelector( '.mjml-eb-layout' );
+		var $resizer = $( '.mjml-eb-resizer' );
+		if ( ! layout || ! $resizer.length ) return;
+
+		function store( key, val ) {
+			try {
+				if ( val === null ) localStorage.removeItem( key );
+				else                localStorage.setItem( key, val );
+			} catch ( e ) {} // private mode / storage disabled — width just won't persist
+		}
+
+		function read( key ) {
+			try { return localStorage.getItem( key ); } catch ( e ) { return null; }
+		}
+
+		function clamp( width ) {
+			var max = layout.getBoundingClientRect().width - MIN_BUILDER_W;
+			return Math.max( MIN_PREVIEW_W, Math.min( width, Math.max( MIN_PREVIEW_W, max ) ) );
+		}
+
+		function apply( width ) {
+			layout.style.setProperty( '--mjml-preview-w', clamp( width ) + 'px' );
+		}
+
+		function currentWidth() {
+			var panel = document.getElementById( 'mjml-output-panel' );
+			return panel ? panel.getBoundingClientRect().width : DEFAULT_W;
+		}
+
+		var saved = parseFloat( read( PREVIEW_W_KEY ) );
+		if ( isFinite( saved ) && saved > 0 ) apply( saved );
+
+		// Drag: the preview is the right-hand column, so its width grows as the
+		// pointer moves left.
+		$resizer.on( 'pointerdown', function( e ) {
+			if ( e.button !== 0 ) return;
+			e.preventDefault();
+
+			var startX = e.clientX;
+			var startW = currentWidth();
+			try { this.setPointerCapture( e.pointerId ); } catch ( err ) {} // not fatal if unsupported
+			$( 'body' ).addClass( 'mjml-eb-resizing' );
+
+			var $handle = $( this );
+
+			function onMove( ev ) {
+				apply( startW + ( startX - ev.clientX ) );
+			}
+
+			function onUp() {
+				$handle.off( 'pointermove', onMove ).off( 'pointerup pointercancel', onUp );
+				$( 'body' ).removeClass( 'mjml-eb-resizing' );
+				store( PREVIEW_W_KEY, Math.round( currentWidth() ) );
+			}
+
+			$handle.on( 'pointermove', onMove ).on( 'pointerup pointercancel', onUp );
+		} );
+
+		// Double-click restores the default split.
+		$resizer.on( 'dblclick', function() {
+			layout.style.removeProperty( '--mjml-preview-w' );
+			store( PREVIEW_W_KEY, null );
+		} );
+
+		// Keyboard resizing for the focused handle.
+		$resizer.on( 'keydown', function( e ) {
+			if ( e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' ) return;
+			e.preventDefault();
+			var step = ( e.shiftKey ? 100 : 20 ) * ( e.key === 'ArrowLeft' ? 1 : -1 );
+			apply( currentWidth() + step );
+			store( PREVIEW_W_KEY, Math.round( currentWidth() ) );
+		} );
+
+		// Keep the width within bounds when the window changes size. Skipped while
+		// the layout is stacked (the handle is hidden), where the preview column
+		// spans the full width and would otherwise be re-saved as a huge value.
+		$( window ).on( 'resize', function() {
+			if ( ! $resizer.is( ':visible' ) ) return;
+			if ( layout.style.getPropertyValue( '--mjml-preview-w' ) ) apply( currentWidth() );
+		} );
+	} )();
 
 	// ── List page: delete, duplicate, archive ───────────────────────────────
 	$( '.mjml-delete-template' ).on( 'click', function( e ) {
@@ -2014,9 +2485,11 @@ jQuery( function ( $ ) {
 					'<mj-text>' + block.content + '</mj-text>' +
 					'</mj-column></mj-section>';
 			case 'image':
+				var imgWidth = pxLength( block.width );
 				return '<mj-section padding="0"><mj-column>' +
 					'<mj-image src="' + esc(block.src) + '"' +
 					(block.href ? ' href="' + esc(block.href) + '"' : '') +
+					(imgWidth ? ' width="' + esc(imgWidth) + '"' : '') +
 					'></mj-image></mj-column></mj-section>';
 			case 'button':
 				return '<mj-section padding="10px 0"><mj-column>' +
@@ -2274,6 +2747,14 @@ jQuery( function ( $ ) {
 		return topSpacer +
 			'<mj-section><mj-column><mj-navbar base-url="">' + leadHtml + links + '</mj-navbar></mj-column></mj-section>' +
 			bottomSpacer;
+	}
+
+	// Normalise a user-entered width to pixels. mj-image only handles px reliably,
+	// so we keep the number and drop anything else the user typed ("300", "300px"
+	// and "300 px" all become "300px"). Blank or non-numeric stays blank.
+	function pxLength( val ) {
+		var num = parseFloat( String( val || '' ).replace( /[^0-9.]/g, '' ) );
+		return ( isFinite( num ) && num > 0 ) ? num + 'px' : '';
 	}
 
 	function esc( str ) {

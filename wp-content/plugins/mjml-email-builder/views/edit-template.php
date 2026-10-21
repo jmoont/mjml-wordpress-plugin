@@ -22,13 +22,39 @@ $is_template = $template && MJML_Post_Type::STATUS_TEMPLATE === $template->post_
 				<span class="dashicons dashicons-undo"></span>
 				<?php esc_html_e( 'Undo', 'mjml-email-builder' ); ?>
 			</button>
-			<button id="mjml-clear-all-btn" class="button" title="<?php esc_attr_e( 'Blank the content of every block (keeps structure)', 'mjml-email-builder' ); ?>">
-				<?php esc_html_e( 'Clear all content', 'mjml-email-builder' ); ?>
-			</button>
 			<?php /* Template feature disabled (v2.4.3): "Save as template" / "Use this template" removed from the UI — superseded by the per-block hide toggle. Backend handlers remain so existing template posts are preserved. */ ?>
-			<button id="mjml-copy-mjml-btn" class="button"><?php esc_html_e( 'Copy MJML', 'mjml-email-builder' ); ?></button>
-			<button id="mjml-convert-btn" class="button button-primary"><?php esc_html_e( 'Compile to HTML', 'mjml-email-builder' ); ?></button>
+			<button id="mjml-convert-btn" class="button"><?php esc_html_e( 'Render Preview', 'mjml-email-builder' ); ?></button>
+			<button id="mjml-copy-btn" class="button button-primary"><?php esc_html_e( 'Copy HTML', 'mjml-email-builder' ); ?></button>
+
+			<?php /* Secondary actions live behind an ellipsis so the topbar leads with Render Preview / Copy HTML. */ ?>
+			<div class="mjml-eb-more">
+				<button id="mjml-more-btn" class="button" type="button" aria-haspopup="true" aria-expanded="false"
+				        aria-label="<?php esc_attr_e( 'More actions', 'mjml-email-builder' ); ?>"
+				        title="<?php esc_attr_e( 'More actions', 'mjml-email-builder' ); ?>">
+					<span class="dashicons dashicons-ellipsis"></span>
+				</button>
+				<div id="mjml-more-menu" class="mjml-eb-more-menu" role="menu" hidden>
+					<button id="mjml-copy-mjml-btn" class="mjml-more-item" type="button" role="menuitem">
+						<?php esc_html_e( 'Copy MJML', 'mjml-email-builder' ); ?>
+					</button>
+					<button id="mjml-clear-all-btn" class="mjml-more-item is-destructive" type="button" role="menuitem"
+					        title="<?php esc_attr_e( 'Blank the content of every block (keeps structure)', 'mjml-email-builder' ); ?>">
+						<?php esc_html_e( 'Clear all content', 'mjml-email-builder' ); ?>
+					</button>
+				</div>
+			</div>
 		</div>
+	</div>
+
+	<?php /* Mirrors the topbar's primary actions once it scrolls out of view. */ ?>
+	<div id="mjml-float-actions" class="mjml-eb-float-actions" hidden>
+		<button id="mjml-float-undo-btn" class="button" type="button" disabled
+		        title="<?php esc_attr_e( 'Undo to a previous saved version', 'mjml-email-builder' ); ?>">
+			<span class="dashicons dashicons-undo"></span>
+			<?php esc_html_e( 'Undo', 'mjml-email-builder' ); ?>
+		</button>
+		<button id="mjml-float-convert-btn" class="button" type="button"><?php esc_html_e( 'Render Preview', 'mjml-email-builder' ); ?></button>
+		<button id="mjml-float-copy-btn" class="button button-primary" type="button"><?php esc_html_e( 'Copy HTML', 'mjml-email-builder' ); ?></button>
 	</div>
 
 	<div id="mjml-warnings" class="mjml-eb-warnings" hidden></div>
@@ -73,11 +99,15 @@ $is_template = $template && MJML_Post_Type::STATUS_TEMPLATE === $template->post_
 			</p>
 		</div>
 
+		<?php /* Drag to trade width between the builder and the preview; hidden once the layout stacks. */ ?>
+		<div class="mjml-eb-resizer" role="separator" aria-orientation="vertical" tabindex="0"
+		     aria-label="<?php esc_attr_e( 'Resize preview panel', 'mjml-email-builder' ); ?>"
+		     title="<?php esc_attr_e( 'Drag to resize · double-click to reset', 'mjml-email-builder' ); ?>"></div>
+
 		<!-- HTML output -->
 		<div class="mjml-eb-output postbox" id="mjml-output-panel" <?php echo empty( $compiled_html ) ? 'style="display:none"' : ''; ?>>
 			<div class="postbox-header">
 				<h2><?php esc_html_e( 'Preview', 'mjml-email-builder' ); ?></h2>
-				<button id="mjml-copy-btn" class="button"><?php esc_html_e( 'Copy HTML', 'mjml-email-builder' ); ?></button>
 			</div>
 			<div class="inside">
 				<iframe id="mjml-preview-frame"
