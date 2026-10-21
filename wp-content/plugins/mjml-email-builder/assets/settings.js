@@ -97,7 +97,9 @@ jQuery( function ( $ ) {
 		// Two-Col Services
 		'<mj-section padding-top="0">' +
 			'<mj-column><mj-text><h3 class="croxdale">Croxdale</h3><ul><li><strong>Hashkama</strong> 8.00am</li><li><strong>Shacharit</strong> 9.30am</li></ul></mj-text></mj-column>' +
-			'<mj-column><mj-text><h3 class="yavneh">Yavneh</h3><ul><li><strong>Shacharit</strong> 9.15am</li></ul></mj-text></mj-column>' +
+			'<mj-column><mj-text><h3 class="yavneh">Yavneh</h3><ul><li><strong>Shacharit</strong> 9.15am</li></ul>' +
+				'<p class="svc-sub" style="margin:16px 0 0">Mincha Only</p>' +
+				'<ul><li><strong>Monday - Thursday</strong> 1.00pm</li></ul></mj-text></mj-column>' +
 		'</mj-section>',
 
 		// Notice List
