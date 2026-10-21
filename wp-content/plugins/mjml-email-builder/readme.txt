@@ -4,7 +4,7 @@ Tags: mjml, email, templates, newsletter
 Requires at least: 5.8
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 2.4.23
+Stable tag: 2.4.24
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -73,6 +73,9 @@ Use **Settings → Export** to download a JSON bundle containing your themes plu
 Yes. The preview iframe runs with `sandbox="allow-same-origin"` only — scripts inside the email cannot execute. Email clients don't run scripts either, so this matches real-world behaviour.
 
 == Changelog ==
+
+= 2.4.24 =
+* Service-list sub-headings are now bold, wrapped in a `<strong>` tag (carrying the site colour when one is chosen, as service labels do). Previously they rendered at regular weight.
 
 = 2.4.23 =
 * Two-Col Services: service lists can now be broken into sub-sections. Each column has a "+ Add sub-heading" button that inserts a heading row (text plus optional site colour); it closes the running list and starts a fresh one beneath it, so a column can read e.g. "Mincha & Ma'ariv" → Sunday times → "Mincha Only" → weekday times → "Ma'ariv Only" → weekday times. Sub-headings drag, duplicate, hide and delete like any other row, and "Clear content" keeps them since they are structure. The single-column Service List block gained the same button.
