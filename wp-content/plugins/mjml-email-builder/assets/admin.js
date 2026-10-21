@@ -2594,7 +2594,7 @@ jQuery( function ( $ ) {
 		// Inline margins so sub-sections space correctly in every theme without
 		// each one needing its own .svc-sub rule (themes can still override).
 		return '<p class="svc-sub" style="margin:16px 0 0">' +
-			( item.color ? '<span class="' + esc( item.color ) + '">' + esc( text ) + '</span>' : esc( text ) ) +
+			'<strong' + ( item.color ? ' class="' + esc( item.color ) + '"' : '' ) + '>' + esc( text ) + '</strong>' +
 			'</p>';
 	}
 
